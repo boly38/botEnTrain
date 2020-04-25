@@ -1,0 +1,25 @@
+{
+  "name": "botEnTrain",
+  "version": "1.0.0",
+  "description": "Twitter botEnTrain",
+  "main": "bt.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boly38/botEnTrain.git"
+  },
+  "keywords": [
+    "twitter",
+    "bot",
+    "botEnTrain"
+  ],
+  "author": "Boly38",
+  "license": "MIT",
+  "homepage": "https://github.com/boly38/botEnTrain",
+  "bugs": {
+    "url": "https://github.com/boly38/botEnTrain/issues"
+  },
+  "dependencies": {
+    "log4js": "^0.6.28",
+    "twit": "^2.2.11"
+  }
+}
