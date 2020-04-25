@@ -2,7 +2,11 @@
   "name": "botEnTrain",
   "version": "1.0.0",
   "description": "Twitter botEnTrain",
-  "main": "bt.js",
+  "main": "heroku.js",
+  "scripts": {
+    "start": "node heroku.js",
+    "test": "node test.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/boly38/botEnTrain.git"
@@ -19,6 +23,8 @@
     "url": "https://github.com/boly38/botEnTrain/issues"
   },
   "dependencies": {
+    "ejs": "^3.1.2",
+    "express": "^4.17.1",
     "log4js": "^0.6.28",
     "twit": "^2.2.11"
   }
