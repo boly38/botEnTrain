@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 const express = require('express');
-const PORT = process.env.PORT || 5000
-const app = express();
+const PORT = process.env.PORT || 5000;
+const HOOK = process.env.HOOK_NAME || 'hookthatmustbesecure';
 const path = require('path');
 var pjson = require('./package.json');
 const VERSION = process.env.VERSION || pjson.version;
@@ -19,12 +19,21 @@ express()
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
-  .get('/', (req, res) => res.render('pages/index', getPageData()))
+  .get('/'+HOOK, (req, res) => res.render('pages/index', getPageData(req, true)))
+  .get('/*', (req, res) => res.render('pages/index', getPageData(req, false)))
   .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
+function getRemoteAddress(request) {
+    return request.headers['x-forwarded-for'] ?
+        request.headers['x-forwarded-for']
+        : request.connection.remoteAddress;
+}
 
-
-function getPageData() {
+function getPageData(request, hookOriginated) {
+  let remoteAdd = getRemoteAddress(request);
+  if (hookOriginated) {
+    botEngine.process(remoteAdd);
+  }
   return {
        "version": VERSION,
        "news": newsBot.getNews()
