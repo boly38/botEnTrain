@@ -25,7 +25,7 @@ class BET {
 
       // Search parameters
       var params = {
-        q: '#bot',
+        q: '"l\'heure de se réveiller"',
         count: 10,
         result_type: 'recent',
         lang: 'fr'
