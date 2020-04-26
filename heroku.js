@@ -3,7 +3,8 @@ const express = require('express');
 const PORT = process.env.PORT || 5000
 const app = express();
 const path = require('path');
-const VERSION = process.env.VERSION || "1.0.0";
+var pjson = require('./package.json');
+const VERSION = process.env.VERSION || pjson.version;
 
 const NewsBot = require('./NewsBot.js');
 const BotEngine = require('./BotEngine.js');

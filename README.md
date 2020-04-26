@@ -34,7 +34,7 @@ $ git clone https://github.com/boly38/botEnTrain.git
 ### Start the bot
 
 Execute the application
-> node heroku
+> npm start
 
 ### Contribution
 Please submit a [pull request](https://github.com/boly38/botEnTrain/pulls)
