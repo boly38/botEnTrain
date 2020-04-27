@@ -1,10 +1,10 @@
 {
   "name": "botEnTrain",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Twitter botEnTrain",
-  "main": "heroku.js",
+  "main": "bet.js",
   "scripts": {
-    "start": "node heroku.js",
+    "start": "node bet.js",
     "test": "node test.js"
   },
   "repository": {
