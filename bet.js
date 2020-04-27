@@ -6,10 +6,10 @@ const path = require('path');
 var pjson = require('./package.json');
 const VERSION = process.env.VERSION || pjson.version;
 
-const NewsBot = require('./NewsBot.js');
-const BotEngine = require('./BotEngine.js');
+const NewsBot = require('./core/NewsBot.js');
+const BotEngine = require('./core/BotEngine.js');
 
-var newsBot = new NewsBot();
+var newsBot = new NewsBot(30);
 newsBot.add("started bot " + VERSION + " right now");
 
 var botEngine = new BotEngine(newsBot);

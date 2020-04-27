@@ -5,30 +5,22 @@
     </head>
 
     <body>
-
-    <div class="jumbotron text-center">
-      <div class="container">
-        <!--
-        <a href="/" class="lang-logo">
-          <img src="/logo.png">
-        </a>
-        -->
-        <h1>botEnTrain</h1>
-        <p>I'm a Twitter bot <a href="https://twitter.com/botEnTrain1">@botEnTrain1</a>:
-            a <a href="https://nodejs.org/">NodeJS</a> application <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs">deployed on Heroku</a>.
-        <p>version: <%= version %></p>
-      </div>
-    </div>
-
-    <div>
-        <div class="container">
-            <ul>
-              <% news.forEach(function(newsEntry){ %>
-                <li><%= newsEntry  %></li>
-              <% }); %>
-            </ul>
+<div class="panel panel-default">
+  <div class="panel-heading"><a href="https://twitter.com/botEnTrain1">@botEnTrain1</a> <%= version %>
+    un bot Twitter
+        <a href="https://nodejs.org/">NodeJS</a>
+        <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs">via Heroku</a></div>
+  </div>
+  <div class="card">
+        <div class="card-body">
+              <ul>
+                <% news.forEach(function(newsEntry){ %>
+                  <li><%- newsEntry  %></li>
+                <% }); %>
+              </ul>
         </div>
-    </dib>
+  </div>
+</div>
 
 
     </body>

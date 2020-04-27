@@ -27,8 +27,9 @@ class TwitterClient {
 
   search(searchQuery, searchCount, cb) {
       // Search parameters
+      // doc: https://developer.twitter.com/en/docs/tweets/rules-and-filtering/overview/standard-operators
       let params = {
-        q: "\"" + searchQuery + "\"",
+        q: searchQuery,
         count: searchCount,
         result_type: 'recent',
         lang: 'fr'
@@ -91,6 +92,7 @@ class TwitterClient {
     let tweetId = tweet.id_str;
     return `https://twitter.com/${username}/status/${tweetId}`;
   }
+
   tweetInfoOf(tweet) {
     if (!tweet) {
       return "";
@@ -99,6 +101,18 @@ class TwitterClient {
     let tweetText = tweet.text;
     let tweetDate = tweet.created_at;
     return `@${username} : ${tweetText} --- ${tweetDate}`;
+  }
+
+  tweetHtmlOf(tweet) {
+    if (!tweet) {
+      return "";
+    }
+    let username = tweet.user.screen_name;
+    let tweetText = tweet.text;
+    let tweetDate = tweet.created_at;
+    let tweetId = tweet.id_str;
+    return `<a href="https://twitter.com/${username}/status/${tweetId}">${tweetDate}</a> --- ` +
+           `<a href="https://twitter.com/${username}">@${username}</a>: ${tweetText}`;
   }
 
   logError(msg) {

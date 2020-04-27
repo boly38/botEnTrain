@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 const log4js = require('log4js');
-const TwitterClient = require('./core/TwitterClient.js');
-const FilmBTP = require('./plugins/FilmBTP.js');
+const TwitterClient = require('./TwitterClient.js');
+const FilmBTP = require('../plugins/FilmBTP');
 
 // const ENGINE_MIN_INTERVAL_MS=6000;//6 seconds // DEV MODE
 const ENGINE_MIN_INTERVAL_MS=60*60000;// min 1 each hour*
@@ -44,8 +44,8 @@ class BotEngine {
         if(err) {
           engine.logError("plugin error " + err);
         }
-        engine.logInfo("plugin result "+ result);
-        engine.newsBot.add(result);
+        engine.logInfo("plugin result "+ result.text);
+        engine.newsBot.add(result.html);
     });
   }
 
