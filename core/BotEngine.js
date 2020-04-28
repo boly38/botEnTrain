@@ -45,6 +45,8 @@ class BotEngine {
     plugin.process((err, result) => {
         if(err) {
           engine.logError("plugin error " + err);
+          engine.newsBot.add(err);
+          return;
         }
         engine.logInfo("plugin result "+ result.text);
         engine.newsBot.add(result.html);
