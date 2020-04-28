@@ -1,9 +1,10 @@
 /*jshint esversion: 6 */
+const dateFormat = require('dateformat');
 const Twit = require('twit');
 var log4js = require('log4js');
 
 class TwitterClient {
-  constructor(simulationDisabled) {
+  constructor() {
     this.logger = log4js.getLogger();
     this.logger.setLevel('INFO'); // DEBUG will show api params
     if (!process.env.APPLICATION_CONSUMER_KEY_HERE ||
@@ -21,7 +22,6 @@ class TwitterClient {
       timeout_ms:           6*1000,  // optional HTTP request timeout to apply to all requests.
       strictSSL:            true,
     });
-    this.simulationDisabled = simulationDisabled;
   }
 
   search(searchQuery, searchCount, cb) {
@@ -46,7 +46,7 @@ class TwitterClient {
       });
   }
 
-  replyTo(tweet, replyMsg, cb) {
+  replyTo(tweet, replyMsg, doSimulate, cb) {
       let replyStatus = '@' + tweet.user.screen_name + ' - ' + replyMsg;
       let params = {
         in_reply_to_status_id: tweet.id_str,
@@ -57,12 +57,12 @@ class TwitterClient {
       this.logInfo("Plan to reply to => " + this.tweetLinkOf(tweet));
       this.logInfo(" " + this.tweetInfoOf(tweet));
 
-      if (!this.simulationDisabled) {
+      if (doSimulate) {
           cb(false, {
             "id":1234,
             "id_str":1234,
-            "text":replyStatus,
-            "created_at":"(THIS WAS A SIMULATED REPLY)",
+            "text": "SIMULATION - "+replyStatus,
+            "created_at": (new Date()).toUTCString(),
             "user": {
                 "id": 1254020717710053400,
                 "id_str": '1254020717710053376',
@@ -98,8 +98,8 @@ class TwitterClient {
     }
     let username = tweet.user.screen_name;
     let tweetText = tweet.text;
-    let tweetDate = tweet.created_at;
-    return `@${username} : ${tweetText} --- ${tweetDate}`;
+    let tweetDate = this.toLocaleDate(tweet.created_at);
+    return `${tweetDate} --- @${username}: ${tweetText}`;
   }
 
   tweetHtmlOf(tweet) {
@@ -108,10 +108,18 @@ class TwitterClient {
     }
     let username = tweet.user.screen_name;
     let tweetText = tweet.text;
-    let tweetDate = tweet.created_at;
+    let tweetDate = this.toLocaleDate(tweet.created_at);
     let tweetId = tweet.id_str;
     return `<a href="https://twitter.com/${username}/status/${tweetId}">${tweetDate}</a> --- ` +
            `<a href="https://twitter.com/${username}">@${username}</a>: ${tweetText}`;
+  }
+
+  toLocaleDate(twitterDate) {
+     try {
+      return dateFormat(new Date(twitterDate), "yyyy-mm-dd HH:MM:ss");
+    } catch (err) {
+      return twitterDate;
+    }
   }
 
   logError(msg) {

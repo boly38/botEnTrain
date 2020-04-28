@@ -26,7 +26,7 @@ class FilmBTP {
     return this.isAvailable;
   }
 
-  process(cb) {
+  process(doSimulate, cb) {
     let behavior = this.randomFromArray(this.behaviors);
     let tweets = this.searchTweets(behavior, (err, tweets) => {
         if (err) {
@@ -53,16 +53,16 @@ class FilmBTP {
             cb("aucun candidat pour '<b>" + behavior.search + "</b>'");
             return;
         }
-        this.replyTweet(tweetCandidate, behavior, (err, replyTweet) => {
+        this.replyTweet(doSimulate, tweetCandidate, behavior, (err, replyTweet) => {
             if (err) {
                 this.logError(err);
                 cb("impossible de répondre au tweet");
                 return;
             }
             cb(false, {
-                "html": "<b>Tweet</b>: " +
-                    this.twitterClient.tweetHtmlOf(tweetCandidate) +
-                    "<br><b>Réponse émise</b>:" +
+                "html": "<b>Tweet</b>: <div class=\"bg-info\">" +
+                    this.twitterClient.tweetHtmlOf(tweetCandidate) + "</div>" +
+                    "<b>Réponse émise</b>: " +
                     this.twitterClient.tweetHtmlOf(replyTweet),
                 "text": "\nTweet:\n\t" +
                     this.twitterClient.tweetLinkOf(tweetCandidate) + "\n\t" +
@@ -102,11 +102,11 @@ class FilmBTP {
     });
   }
 
-  replyTweet(tweet, behavior, cb) {
+  replyTweet(doSimulate, tweet, behavior, cb) {
     let replyMessage = behavior.reply + "\n" +
     behavior.link + "\n" +
     this.getPluginTags();
-    this.twitterClient.replyTo(tweet, replyMessage, cb);
+    this.twitterClient.replyTo(tweet, replyMessage, doSimulate, cb);
   }
 
   randomFromArray(arr) {
