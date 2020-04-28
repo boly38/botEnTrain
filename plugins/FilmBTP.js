@@ -1,17 +1,21 @@
 /*jshint esversion: 6 */
-var log4js = require('log4js');
+const log4js = require('log4js');
+const fs = require('fs');
 
 class FilmBTP {
   constructor(twitterClient) {
+    this.isAvailable = false;
     this.logger = log4js.getLogger();
     this.logger.setLevel('DEBUG'); // DEBUG will show search results
     this.twitterClient = twitterClient;
-    this.behaviors = [
-        { "search":"ça se mange sans faim.", // "est très fin",
-          "reply":"C'est fin, c'est très fin, ça se mange sans faim.",
-          "link":"https://www.youtube.com/watch?v=xa2A07mhG9g"
-        }
-    ];
+    try {
+        let behaviorsData = fs.readFileSync('plugins/data/filmBtp.json');
+        this.behaviors = JSON.parse(behaviorsData);
+        this.isAvailable = true;
+        this.logInfo("available with " + this.behaviors.length + " behaviors");
+    } catch (exception) {
+        this.logError(exception);
+    }
   }
 
   getPluginTags() {
@@ -19,11 +23,11 @@ class FilmBTP {
   }
 
   isReady() {
-    return true;
+    return this.isAvailable;
   }
 
   process(cb) {
-    let behavior = this.behaviors[0];
+    let behavior = this.randomFromArray(this.behaviors);
     let tweets = this.searchTweets(behavior, (err, tweets) => {
         if (err) {
             this.logError(err);
