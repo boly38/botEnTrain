@@ -50,7 +50,7 @@ class FilmBTP {
          " filtered:" + filteredTweets.length);
         let tweetCandidate = this.randomFromArray(filteredTweets);
         if (!tweetCandidate) {
-            cb("no candidate");
+            cb("aucun candidat pour '<b>" + behavior.search + "</b>'");
             return;
         }
         this.replyTweet(tweetCandidate, behavior, (err, replyTweet) => {

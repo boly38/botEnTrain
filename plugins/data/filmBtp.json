@@ -16,7 +16,7 @@
     "link": "https://www.youtube.com/watch?v=tNeig1leks8"
   },
   {
-    "search": "pas content!",
+    "search": "pas content du tout",
     "reply": "pas content! pas content!",
     "link": "https://www.youtube.com/watch?v=7KaZ-y7e9BQ"
   },
@@ -56,8 +56,19 @@
     "link": "https://www.youtube.com/watch?v=Gw0Xg5Lft48"
   },
   {
+    "indexIs": 11,
     "search": "l'heure de se réveiller",
     "reply": "Monseignor, il est l'or, l'or de se réveiller",
     "link": "https://youtu.be/_sJYrReI3h8"
+  },
+  {
+    "search": "je ne jette pas la pierre",
+    "reply": "Je ne vous jette pas la pierre",
+    "link": "https://www.youtube.com/watch?v=xOiHmGdojG4"
+  },
+  {
+    "search": "finis toujours le travail",
+    "reply": "Mais l'ennui c'est que moi, je finis toujours le travail pour lequel on me paie.",
+    "link": "https://www.youtube.com/watch?v=MoCdsPljsKk"
   }
 ]
