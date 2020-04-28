@@ -2,10 +2,8 @@
 const Twit = require('twit');
 var log4js = require('log4js');
 
-const TWITTER_POST_ACTION = false;
-
 class TwitterClient {
-  constructor() {
+  constructor(simulationDisabled) {
     this.logger = log4js.getLogger();
     this.logger.setLevel('INFO'); // DEBUG will show api params
     if (!process.env.APPLICATION_CONSUMER_KEY_HERE ||
@@ -23,6 +21,7 @@ class TwitterClient {
       timeout_ms:           6*1000,  // optional HTTP request timeout to apply to all requests.
       strictSSL:            true,
     });
+    this.simulationDisabled = simulationDisabled;
   }
 
   search(searchQuery, searchCount, cb) {
@@ -58,7 +57,7 @@ class TwitterClient {
       this.logInfo("Plan to reply to => " + this.tweetLinkOf(tweet));
       this.logInfo(" " + this.tweetInfoOf(tweet));
 
-      if (!TWITTER_POST_ACTION) {
+      if (!this.simulationDisabled) {
           cb(false, {
             "id":1234,
             "id_str":1234,

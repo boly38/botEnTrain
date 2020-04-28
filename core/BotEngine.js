@@ -3,15 +3,15 @@ const log4js = require('log4js');
 const TwitterClient = require('./TwitterClient.js');
 const FilmBTP = require('../plugins/FilmBTP');
 
-// const ENGINE_MIN_INTERVAL_MS=6000;//6 seconds // DEV MODE
-const ENGINE_MIN_INTERVAL_MS=60*60000;// min 1 each hour*
+const ENGINE_MIN_INTERVAL_MS=10000;// min each 10 seconds
 
 class BotEngine {
-  constructor(newsBotDep, engineMinIntervalMs) {
+  constructor(newsBotDep, simulationDisabled, engineMinIntervalMs) {
     this.logger = log4js.getLogger();
     this.logger.setLevel('INFO');
-    this.twitterClient = new TwitterClient();
+    this.twitterClient = new TwitterClient(simulationDisabled);
     this.newsBot = newsBotDep;
+    this.simulationDisabled = simulationDisabled;
     this.intervalMs = engineMinIntervalMs && engineMinIntervalMs >= ENGINE_MIN_INTERVAL_MS ?
         engineMinIntervalMs : ENGINE_MIN_INTERVAL_MS;
     this.plugins = [];
@@ -20,6 +20,9 @@ class BotEngine {
   run() {
     let engine = this;
     engine.plugins.push(new FilmBTP(engine.twitterClient));
+    engine.logInfo("started with " + engine.plugins.length +
+       " plugin(s) and minInterval:" + this.intervalMs +
+       (this.simulationDisabled ? "" : " *SIMULATION ONLY*"));
   }
 
   process(remoteAdd) {

@@ -5,6 +5,9 @@ const HOOK = process.env.HOOK_NAME || 'hookthatmustbesecure';
 const path = require('path');
 var pjson = require('./package.json');
 const VERSION = process.env.VERSION || pjson.version;
+const SIMULATION_DISABLED = process.env.SIMULATION_DISABLED || false;
+const ENGINE_MIN_INTERVAL_MS = SIMULATION_DISABLED ? 59000 : undefined;
+
 
 const NewsBot = require('./core/NewsBot.js');
 const BotEngine = require('./core/BotEngine.js');
@@ -12,7 +15,7 @@ const BotEngine = require('./core/BotEngine.js');
 var newsBot = new NewsBot(30);
 newsBot.add("Réveil du robot en version " + VERSION);
 
-var botEngine = new BotEngine(newsBot);
+var botEngine = new BotEngine(newsBot, SIMULATION_DISABLED, ENGINE_MIN_INTERVAL_MS);
 botEngine.run();
 
 express()
