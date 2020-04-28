@@ -6,12 +6,11 @@ const FilmBTP = require('../plugins/FilmBTP');
 const ENGINE_MIN_INTERVAL_MS=10000;// min each 10 seconds
 
 class BotEngine {
-  constructor(newsBotDep, simulationDisabled, engineMinIntervalMs) {
+  constructor(newsBotDep, engineMinIntervalMs) {
     this.logger = log4js.getLogger();
     this.logger.setLevel('INFO');
-    this.twitterClient = new TwitterClient(simulationDisabled);
+    this.twitterClient = new TwitterClient();
     this.newsBot = newsBotDep;
-    this.simulationDisabled = simulationDisabled;
     this.intervalMs = engineMinIntervalMs && engineMinIntervalMs >= ENGINE_MIN_INTERVAL_MS ?
         engineMinIntervalMs : ENGINE_MIN_INTERVAL_MS;
     this.plugins = [];
@@ -21,35 +20,38 @@ class BotEngine {
     let engine = this;
     engine.plugins.push(new FilmBTP(engine.twitterClient));
     engine.logInfo("started with " + engine.plugins.length +
-       " plugin(s) and minInterval:" + this.intervalMs +
-       (this.simulationDisabled ? "" : " *SIMULATION ONLY*"));
+       " plugin(s) and minInterval:" + this.intervalMs);
   }
 
-  process(remoteAdd) {
+  process(remoteAdd, doSimulate, cb) {
     let engine = this;
     let nowMs = (new Date()).getTime();
     let allowedTs = engine.lastProcess + engine.intervalMs;
     let needToWaitSec = Math.floor((allowedTs - nowMs)/1000);
     if (engine.lastProcess && allowedTs > nowMs) {
         engine.logInfo(remoteAdd + " | need to wait " + needToWaitSec + " sec" );
+        cb("Demande trop rapprochée, retentez plus tard");
         return;
     }
     engine.lastProcess = nowMs;
     let plugin = this.randomFromArray(this.plugins); // TODO create plugin chooser component
     if (!plugin || !plugin.isReady()) {
         engine.logInfo(remoteAdd + " | no plugin available");
+        cb("je suis actuellement en maintenance, retentez plus tard");
         return;
     }
     engine.logInfo(remoteAdd + " | process right now - " + plugin.getPluginTags());
     engine.newsBot.add("Exécution du plugin - " + plugin.getPluginTags());
-    plugin.process((err, result) => {
+    plugin.process(doSimulate, (err, result) => {
         if(err) {
           engine.logError("plugin error " + err);
           engine.newsBot.add(err);
+          cb(err);
           return;
         }
         engine.logInfo("plugin result "+ result.text);
         engine.newsBot.add(result.html);
+        cb(false, result.text);
     });
   }
 
