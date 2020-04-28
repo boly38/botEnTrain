@@ -19,7 +19,6 @@ class BotEngine {
 
   run() {
     let engine = this;
-    engine.newsBot.add("engine start !");
     engine.plugins.push(new FilmBTP(engine.twitterClient));
   }
 
@@ -39,7 +38,7 @@ class BotEngine {
         return;
     }
     engine.logInfo(remoteAdd + " | process right now - " + plugin.getPluginTags());
-    engine.newsBot.add("process right now - " + plugin.getPluginTags());
+    engine.newsBot.add("Exécution du plugin - " + plugin.getPluginTags());
     plugin.process((err, result) => {
         if(err) {
           engine.logError("plugin error " + err);

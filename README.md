@@ -5,9 +5,10 @@ Written in JavaScript for node.js this project is a Twitter bot.
 - Twitter account : https://twitter.com/botEnTrain1
 - Bot webPage : https://botentrain.herokuapp.com/
 
-## Bot features
+## Bot features (plugins)
 
-- WiP :)
+- `FilmBTP` - reply to some french film quotes, with a youtube video
+- (some other are planned)
 
 ## Quick start
 
@@ -45,3 +46,16 @@ Activated bot:
 ### Support (bug, improvment)
 
 Please use [issues](https://github.com/boly38/botEnTrain/issues)
+
+
+### Credits
+
+Application and code structure: 
+- [NodeJs](https://nodejs.org/) and Node dependencyes (cf. [graph](https://github.com/boly38/botEnTrain/network/dependencies)) 
+- Twitter API ([doc](https://developer.twitter.com/en/docs))
+
+Services
+- [Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs) hosting and automated review,deployments
+- [Cron-job.org](https://cron-job.org/) scheduler
+
+Team: cf. [contributors](https://github.com/boly38/botEnTrain/graphs/contributors)

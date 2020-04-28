@@ -10,7 +10,7 @@ const NewsBot = require('./core/NewsBot.js');
 const BotEngine = require('./core/BotEngine.js');
 
 var newsBot = new NewsBot(30);
-newsBot.add("started bot " + VERSION + " right now");
+newsBot.add("Réveil du robot en version " + VERSION);
 
 var botEngine = new BotEngine(newsBot);
 botEngine.run();
@@ -35,7 +35,6 @@ function getPageData(request, hookOriginated) {
     botEngine.process(remoteAdd);
   }
   return {
-       "version": VERSION,
        "news": newsBot.getNews()
    };
 }

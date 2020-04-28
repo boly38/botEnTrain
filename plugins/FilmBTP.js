@@ -27,7 +27,7 @@ class FilmBTP {
     let tweets = this.searchTweets(behavior, (err, tweets) => {
         if (err) {
             this.logError(err);
-            cb("unable to search tweet");
+            cb("impossible de chercher des tweets");
             return;
         }
         /*
@@ -52,13 +52,13 @@ class FilmBTP {
         this.replyTweet(tweetCandidate, behavior, (err, replyTweet) => {
             if (err) {
                 this.logError(err);
-                cb("unable to reply tweet");
+                cb("impossible de répondre au tweet");
                 return;
             }
             cb(false, {
                 "html": "<b>Tweet</b>: " +
                     this.twitterClient.tweetHtmlOf(tweetCandidate) +
-                    "<br><b>Reply sent</b>:" +
+                    "<br><b>Réponse émise</b>:" +
                     this.twitterClient.tweetHtmlOf(replyTweet),
                 "text": "\nTweet:\n\t" +
                     this.twitterClient.tweetLinkOf(tweetCandidate) + "\n\t" +
