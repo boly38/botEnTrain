@@ -106,9 +106,11 @@ class FilmBTP {
   }
 
   replyTweet(doSimulate, tweet, behavior, cb) {
-    let replyMessage = behavior.reply + "\n" +
-    behavior.link + "\n" +
-    this.getPluginTags();
+    let replyMessage = behavior.reply + "\n\n";
+    if (behavior.credits) {
+      replyMessage += behavior.credits + "\n";
+    }
+    replyMessage += behavior.link + "\n" + this.getPluginTags();
     this.twitterClient.replyTo(tweet, replyMessage, doSimulate, cb);
   }
 
