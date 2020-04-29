@@ -46,6 +46,7 @@ class BotEnTrain {
       try {
           let remoteAdd = bet.getRemoteAddress(req);
           let apiToken = req.get('API-TOKEN');
+          let pluginName = req.get('PLUGIN-NAME');
           let doSimulate = bet.tokenSimulation && apiToken === bet.tokenSimulation;
           let doAction = !doSimulate && bet.tokenAction && apiToken === bet.tokenAction;
           if (!doSimulate && !doAction) {
@@ -55,7 +56,7 @@ class BotEnTrain {
             });
             return;
           }
-          bet.botEngine.process(remoteAdd, doSimulate, (err, pluginResult) => {
+          bet.botEngine.process(remoteAdd, doSimulate, pluginName, (err, pluginResult) => {
             let msg = err ? err : pluginResult;
             res.status(err ? err.status : 200).json({
                         success: err ? false : true,
@@ -73,7 +74,7 @@ class BotEnTrain {
     }
 
     getSecondeId() {
-      return dateFormat(getDate(), "yyyymmddHHMMss");
+      return dateFormat(this.getDate(), "yyyymmddHHMMss");
     }
 
     getDate() {

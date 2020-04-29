@@ -24,7 +24,28 @@ class TwitterClient {
     });
   }
 
-  search(searchQuery, searchCount, cb) {
+  // https://developer.twitter.com/en/docs/tweets/post-and-engage/overview
+  //   GET statuses/show/:id
+  //   https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-show-id
+  getTweetDetails(tweetId) {
+      let params = {
+        "id": tweetId,
+        "tweet_mode":"extended"
+      };
+        // useless "include_entities": true,
+      this.twit.get('statuses/show', params, (err, data, response) => {
+        if(!err){
+          this.logDebug("GET statuses/show:" + JSON.stringify(params) + " - result:" +
+            JSON.stringify(data));
+          // cb(false, tweets);
+        } else {
+          this.logError("GET statuses/show:" + params + " - err:" + err);
+          // cb(err);
+        }
+      });
+  }
+
+  search(searchQuery, searchCount, extendedMode, cb) {
       // Search parameters
       // doc: https://developer.twitter.com/en/docs/tweets/rules-and-filtering/overview/standard-operators
       let params = {
@@ -33,6 +54,9 @@ class TwitterClient {
         result_type: 'recent',
         lang: 'fr'
       };
+      if (extendedMode) {
+        params.tweet_mode = "extended";
+      }
 
       this.twit.get('search/tweets', params, (err, data, response) => {
         if(!err){
@@ -97,7 +121,7 @@ class TwitterClient {
       return "";
     }
     let username = tweet.user.screen_name;
-    let tweetText = tweet.text;
+    let tweetText = this.tweetTextOf(tweet);
     let tweetDate = this.toLocaleDate(tweet.created_at);
     return `${tweetDate} --- @${username}: ${tweetText}`;
   }
@@ -107,11 +131,24 @@ class TwitterClient {
       return "";
     }
     let username = tweet.user.screen_name;
-    let tweetText = tweet.text;
+    let tweetText = this.tweetTextOf(tweet);
     let tweetDate = this.toLocaleDate(tweet.created_at);
     let tweetId = tweet.id_str;
     return `<a href="https://twitter.com/${username}/status/${tweetId}">${tweetDate}</a> --- ` +
            `<a href="https://twitter.com/${username}">@${username}</a>: ${tweetText}`;
+  }
+
+  // extended mode includes tweet.full_text only
+  tweetTextOf(tweet) {
+    return tweet.full_text ? tweet.full_text : tweet.text;
+  }
+
+  tweetFirstMediaUrl(extendedTweet) {
+    try {
+        return extendedTweet.entities.media[0].media_url_https;
+    } catch (err) {
+        return false;
+    }
   }
 
   toLocaleDate(twitterDate) {

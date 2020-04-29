@@ -1,0 +1,216 @@
+{
+    "query": {
+        "project": "best",
+        "images": [
+            "https://pbs.twimg.com/media/EIxl61NWoAA4gQ7?format=jpg&name=4096x4096",
+            "https://pbs.twimg.com/media/EIxl61NWoAA4gQ7?format=jpg&name=4096x4096"
+        ],
+        "organs": [
+            "flower",
+            "leaf"
+        ]
+    },
+    "language": "fr",
+    "preferedReferential": "the-plant-list",
+    "results": [
+        {
+            "score": 0.025389546528458595,
+            "species": {
+                "scientificNameWithoutAuthor": "Pancratium illyricum",
+                "scientificNameAuthorship": "L.",
+                "genus": {
+                    "scientificNameWithoutAuthor": "Pancratium",
+                    "scientificNameAuthorship": ""
+                },
+                "family": {
+                    "scientificNameWithoutAuthor": "Amaryllidaceae",
+                    "scientificNameAuthorship": ""
+                },
+                "commonNames": [
+                    "Pancrace d'Illyrie",
+                    "Pancrais d'Illyrie"
+                ]
+            },
+            "images": [
+                {
+                    "organ": "flower",
+                    "author": "Tela Botanica − Liliane Roubaudi",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1363254029000,
+                        "string": "14 mars 2013"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/697b37ebcc41e9d9dc7eb1a24e6b137282be28fa",
+                        "m": "https://bs.floristic.org/v1/image/m/697b37ebcc41e9d9dc7eb1a24e6b137282be28fa",
+                        "s": "https://bs.floristic.org/v1/image/s/697b37ebcc41e9d9dc7eb1a24e6b137282be28fa"
+                    },
+                    "citation": "Tela Botanica − Liliane Roubaudi/ Pl@ntNet, cc-by-sa"
+                },
+                {
+                    "organ": "flower",
+                    "author": "Tela Botanica − Liliane Roubaudi",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1363254029000,
+                        "string": "14 mars 2013"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/5102f9428640d5533a47441e6c0ed19e9028240c",
+                        "m": "https://bs.floristic.org/v1/image/m/5102f9428640d5533a47441e6c0ed19e9028240c",
+                        "s": "https://bs.floristic.org/v1/image/s/5102f9428640d5533a47441e6c0ed19e9028240c"
+                    },
+                    "citation": "Tela Botanica − Liliane Roubaudi / Pl@ntNet, cc-by-sa"
+                },
+                {
+                    "organ": "flower",
+                    "author": "Tela Botanica − Liliane Roubaudi",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1363254029000,
+                        "string": "14 mars 2013"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/483e225b301a49bb8f04285f9a5cf454126a6a53",
+                        "m": "https://bs.floristic.org/v1/image/m/483e225b301a49bb8f04285f9a5cf454126a6a53",
+                        "s": "https://bs.floristic.org/v1/image/s/483e225b301a49bb8f04285f9a5cf454126a6a53"
+                    },
+                    "citation": "Tela Botanica − Liliane Roubaudi / Pl@ntNet, cc-by-sa"
+                },
+                {
+                    "organ": "flower",
+                    "author": "Tela Botanica − Liliane Roubaudi",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1363254029000,
+                        "string": "14 mars 2013"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/98f130f411f88dfbc854d7bcb19e97dee7a0cc91",
+                        "m": "https://bs.floristic.org/v1/image/m/98f130f411f88dfbc854d7bcb19e97dee7a0cc91",
+                        "s": "https://bs.floristic.org/v1/image/s/98f130f411f88dfbc854d7bcb19e97dee7a0cc91"
+                    },
+                    "citation": "Tela Botanica − Liliane Roubaudi / Pl@ntNet, cc-by-sa"
+                },
+                {
+                    "organ": "habit",
+                    "author": "Tela Botanica − Christophe GIROD",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1370560275000,
+                        "string": "7 juin 2013"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/8b1fa325e913eea51e8f2537244d9753194f19b6",
+                        "m": "https://bs.floristic.org/v1/image/m/8b1fa325e913eea51e8f2537244d9753194f19b6",
+                        "s": "https://bs.floristic.org/v1/image/s/8b1fa325e913eea51e8f2537244d9753194f19b6"
+                    },
+                    "citation": "Tela Botanica − Christophe GIROD / Pl@ntNet, cc-by-sa"
+                },
+                {
+                    "organ": "habit",
+                    "author": "Tela Botanica − Christophe GIROD",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1370560275000,
+                        "string": "7 juin 2013"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/466449560a1901494fd61215e5134d1fcb76875f",
+                        "m": "https://bs.floristic.org/v1/image/m/466449560a1901494fd61215e5134d1fcb76875f",
+                        "s": "https://bs.floristic.org/v1/image/s/466449560a1901494fd61215e5134d1fcb76875f"
+                    },
+                    "citation": "Tela Botanica − Christophe GIROD / Pl@ntNet, cc-by-sa"
+                }
+            ],
+            "gbif": {
+                "id": "2853249"
+            }
+        },
+        {
+            "score": 0.018649350851774216,
+            "species": {
+                "scientificNameWithoutAuthor": "Ornithogalum nutans",
+                "scientificNameAuthorship": "L.",
+                "genus": {
+                    "scientificNameWithoutAuthor": "Ornithogalum",
+                    "scientificNameAuthorship": ""
+                },
+                "family": {
+                    "scientificNameWithoutAuthor": "Asparagaceae",
+                    "scientificNameAuthorship": ""
+                },
+                "commonNames": [
+                    "Ornithogale penché",
+                    "Ornithogale à fleurs penchées"
+                ]
+            },
+            "images": [
+                {
+                    "organ": "flower",
+                    "author": "EOL − Meneerke bloem",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1482271324774,
+                        "string": "20 décembre 2016"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/7a66ca0aa93421c470183002efe58f63d3893ede",
+                        "m": "https://bs.floristic.org/v1/image/m/7a66ca0aa93421c470183002efe58f63d3893ede",
+                        "s": "https://bs.floristic.org/v1/image/s/7a66ca0aa93421c470183002efe58f63d3893ede"
+                    },
+                    "citation": "EOL − Meneerke bloem / Pl@ntNet, cc-by-sa"
+                },
+                {
+                    "organ": "flower",
+                    "author": "EOL − Encyclopedia of Life",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1482271324775,
+                        "string": "20 décembre 2016"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/9406804a4b04e9b3689c4be0246520eacfa23018",
+                        "m": "https://bs.floristic.org/v1/image/m/9406804a4b04e9b3689c4be0246520eacfa23018",
+                        "s": "https://bs.floristic.org/v1/image/s/9406804a4b04e9b3689c4be0246520eacfa23018"
+                    },
+                    "citation": "EOL − Encyclopedia of Life / Pl@ntNet, cc-by-sa"
+                },
+                {
+                    "organ": "flower",
+                    "author": "EOL − Meneerke bloem",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1482271324774,
+                        "string": "20 décembre 2016"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/c00331ef1d64af13d428d913ba8aeabad866e987",
+                        "m": "https://bs.floristic.org/v1/image/m/c00331ef1d64af13d428d913ba8aeabad866e987",
+                        "s": "https://bs.floristic.org/v1/image/s/c00331ef1d64af13d428d913ba8aeabad866e987"
+                    },
+                    "citation": "EOL − Meneerke bloem / Pl@ntNet, cc-by-sa"
+                },
+                {
+                    "organ": "flower",
+                    "author": "EOL − Meneerke bloem",
+                    "license": "cc-by-sa",
+                    "date": {
+                        "timestamp": 1482271324775,
+                        "string": "20 décembre 2016"
+                    },
+                    "url": {
+                        "o": "https://bs.floristic.org/v1/image/o/61801f28c542a59912b67823925ea4b8187d7fa7",
+                        "m": "https://bs.floristic.org/v1/image/m/61801f28c542a59912b67823925ea4b8187d7fa7",
+                        "s": "https://bs.floristic.org/v1/image/s/61801f28c542a59912b67823925ea4b8187d7fa7"
+                    },
+                    "citation": "EOL − Meneerke bloem / Pl@ntNet, cc-by-sa"
+                }
+            ],
+            "gbif": {
+                "id": "2773281"
+            }
+        }
+    ],
+    "remainingIdentificationRequests": 44
+}
