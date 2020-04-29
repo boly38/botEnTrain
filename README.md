@@ -27,10 +27,10 @@ $ git clone https://github.com/boly38/botEnTrain.git
 ### Setup your own private environment
 
 - copy the template in a private file
-> cp env.template.sh env.dontpush.sh
-- edit `env.dontpush.sh`
+> cp scripts/env.template.sh scripts/bot.dontpush.sh
+- edit `scripts/bot.dontpush.sh`
 - source it
-> . ./env.dontpush.sh
+> . ./scripts/bot.dontpush.sh
 
 ### Start the bot
 

@@ -30,22 +30,24 @@ class BotEngine {
     let needToWaitSec = Math.floor((allowedTs - nowMs)/1000);
     if (engine.lastProcess && allowedTs > nowMs) {
         engine.logInfo(remoteAdd + " | need to wait " + needToWaitSec + " sec" );
-        cb("Demande trop rapprochée, retentez plus tard");
+        cb({"message": "Demande trop rapprochée, retentez plus tard",
+           "status": 429});
         return;
     }
     engine.lastProcess = nowMs;
     let plugin = this.randomFromArray(this.plugins); // TODO create plugin chooser component
     if (!plugin || !plugin.isReady()) {
         engine.logInfo(remoteAdd + " | no plugin available");
-        cb("je suis actuellement en maintenance, retentez plus tard");
+        cb({"message": "je suis actuellement en maintenance, retentez plus tard",
+            "status": 503});
         return;
     }
     engine.logInfo(remoteAdd + " | process right now - " + plugin.getPluginTags());
     engine.newsBot.add("Exécution du plugin - " + plugin.getPluginTags());
     plugin.process(doSimulate, (err, result) => {
         if(err) {
-          engine.logError("plugin error " + err);
-          engine.newsBot.add(err);
+          engine.logWarn("plugin response status:" + err.status + " msg:" + err.message);
+          engine.newsBot.add(err.message);
           cb(err);
           return;
         }
@@ -62,6 +64,9 @@ class BotEngine {
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
+  logWarn(msg) {
+    this.logger.warn("BotEngine | " + msg);
+  }
   logError(msg) {
     this.logger.error("BotEngine | " + msg);
   }
