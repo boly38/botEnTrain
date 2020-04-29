@@ -31,7 +31,7 @@ class FilmBTP {
     let tweets = this.searchTweets(behavior, (err, tweets) => {
         if (err) {
             this.logError(err);
-            cb("impossible de chercher des tweets");
+            cb({ "message": "impossible de chercher des tweets", "status": 500});
             return;
         }
         /*
@@ -50,13 +50,14 @@ class FilmBTP {
          " filtered:" + filteredTweets.length);
         let tweetCandidate = this.randomFromArray(filteredTweets);
         if (!tweetCandidate) {
-            cb("aucun candidat pour '<b>" + behavior.search + "</b>'");
+            cb({ "message": "aucun candidat pour '" + behavior.search + "'",
+                 "status": 202});
             return;
         }
         this.replyTweet(doSimulate, tweetCandidate, behavior, (err, replyTweet) => {
             if (err) {
                 this.logError(err);
-                cb("impossible de répondre au tweet");
+                cb({"message": "impossible de répondre au tweet", "status": 500});
                 return;
             }
             cb(false, {
@@ -92,7 +93,9 @@ class FilmBTP {
                     mentioned.push(mention.screen_name);
                 });
             });
-            plugin.logDebug("Exclude already mentioned users => " + mentioned.join(', '));
+            if (plugin.arrayWithContent(mentioned)) {
+              plugin.logDebug("Exclude already mentioned users => " + mentioned.join(', '));
+            }
         }
         let searchQueryNotMe = "\"" + behavior.search + "\"" + noRetweet + notMe;
         mentioned.forEach((mentionedUser) => {// exclude alreadyMentioned
@@ -114,6 +117,10 @@ class FilmBTP {
         return undefined;
     }
     return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  arrayWithContent(arr) {
+    return (Array.isArray(arr) && arr.length > 0);
   }
 
   logDebug(msg) {
