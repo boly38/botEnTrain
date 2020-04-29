@@ -18,6 +18,10 @@ class FilmBTP {
     }
   }
 
+  getName() {
+    return "FilmBTP";
+  }
+
   getPluginTags() {
     return ["#BetFilm","#RepliquesDeFilms"];
   }
@@ -81,8 +85,9 @@ class FilmBTP {
     let noRetweet = " -filter:retweets";
     let fromMe = " from:botEnTrain1";
     let notMe = " -from:botEnTrain1";
+    let extendedMode = true;
     let searchQueryFromMe = "\"" + behavior.reply + "\"" + noRetweet + fromMe;
-    plugin.twitterClient.search(searchQueryFromMe, 200, (err,tweets) => {
+    plugin.twitterClient.search(searchQueryFromMe, 200, !extendedMode, (err,tweets) => {
         let mentioned = [];
         if (!err) {// get already mentioned users
             tweets.forEach((t) => {
@@ -101,7 +106,7 @@ class FilmBTP {
         mentioned.forEach((mentionedUser) => {// exclude alreadyMentioned
             searchQueryNotMe += " -from:" + mentionedUser;
         });
-        plugin.twitterClient.search(searchQueryNotMe, 20, cb);
+        plugin.twitterClient.search(searchQueryNotMe, 20, !extendedMode, cb);
     });
   }
 
