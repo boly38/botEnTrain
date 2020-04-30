@@ -1,7 +1,9 @@
 /*jshint esversion: 6 */
 const dateFormat = require('dateformat');
 const Twit = require('twit');
-var log4js = require('log4js');
+const log4js = require('log4js');
+
+const TWEET_MAX_LENGTH=280;
 
 class TwitterClient {
   constructor() {
@@ -71,14 +73,20 @@ class TwitterClient {
   }
 
   replyTo(tweet, replyMsg, doSimulate, cb) {
-      let replyStatus = '@' + tweet.user.screen_name + ' - ' + replyMsg;
+      let replyStatus = `@${tweet.user.screen_name} ${replyMsg}`;
+      let replyLength = replyStatus.length;
+      if (replyLength > TWEET_MAX_LENGTH) {
+        let cause = `(${replyStatus.length} > ${TWEET_MAX_LENGTH})`;
+        cb(`replyStatus too long ${cause} : ${replyStatus}`);
+        return;
+      }
       let params = {
         in_reply_to_status_id: tweet.id_str,
         status: replyStatus
       };
 
       this.logDebug("Uses params to reply to : " + JSON.stringify(params));
-      this.logInfo("Plan to reply to => " + this.tweetLinkOf(tweet));
+      this.logInfo(`Plan to reply(${replyLength}) to => ` + this.tweetLinkOf(tweet));
       this.logInfo(" " + this.tweetInfoOf(tweet));
 
       if (doSimulate) {

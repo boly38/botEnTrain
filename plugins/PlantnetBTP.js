@@ -3,6 +3,7 @@ const log4js = require('log4js');
 
 const PLANTNET_MINIMAL_PERCENT = 60;
 const PLANTNET_MINIMAL_RATIO = PLANTNET_MINIMAL_PERCENT / 100;
+const PLANTNET_SIMULATE = false;
 
 class PlantnetBTP {
   constructor(twitterClient, plantnetClient) {
@@ -69,7 +70,7 @@ class PlantnetBTP {
         }
         this.logDebug("candidateImage : " + candidateImage);
 
-        this.plantnetClient.identify(candidateImage, doSimulate, (err, plantResult) => {
+        this.plantnetClient.identify(candidateImage, PLANTNET_SIMULATE, (err, plantResult) => {
             if (err) {
                 this.logError(err);
                 cb({"message": "impossible d'identifier l'image", "status": 500});
@@ -92,11 +93,10 @@ class PlantnetBTP {
   }
 
   replyScoredResult(doSimulate, tweetCandidate, firstScoredResult, cb) {
-      let illustrateImage = this.plantnetClient.resultImageOf(firstScoredResult);
-      let replyMessage = "Bonjour, j'ai interrogé Pl@ntnet pour tenter d'identifier votre première image" +
-      " et voici en résultat : \n" +
+    this.plantnetClient.resultImageOf(firstScoredResult, (illustrateImage) => {
+      let replyMessage = "Pl@ntnet identifie " +
       this.plantnetClient.resultInfoOf(firstScoredResult) + "\n" +
-      (illustrateImage ? "Avec en illustration: " + illustrateImage : "");
+      (illustrateImage ? "\n\n" + illustrateImage : "");
 
       this.replyTweet(doSimulate, tweetCandidate, replyMessage, (err, replyTweet) => {
           if (err) {
@@ -117,6 +117,7 @@ class PlantnetBTP {
                   this.twitterClient.tweetInfoOf(replyTweet) + "\n"
           });
       });
+    });
   }
 
   replyNoScoredResult(doSimulate, tweetCandidate, cb) {

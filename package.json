@@ -1,6 +1,6 @@
 {
   "name": "botEnTrain",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Twitter botEnTrain",
   "main": "bet.js",
   "scripts": {
@@ -29,6 +29,7 @@
     "fs": "0.0.1-security",
     "log4js": "^0.6.28",
     "superagent": "^5.2.2",
+    "tinyurl": "^1.1.5",
     "twit": "^2.2.11"
   }
 }

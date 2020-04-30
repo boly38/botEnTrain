@@ -3,6 +3,7 @@ var log4js = require('log4js');
 const fs = require('fs');
 const superagent = require('superagent');
 const queryString = require('querystring');
+const TinyURL = require('tinyurl');
 
 const MYPLANTNET_API_URL = 'https://my-api.plantnet.org/v2/identify/all';
 
@@ -32,13 +33,11 @@ class MyPlantnetClient {
 
   identify(imageUrl, doSimulate, cb) {
       this.logInfo("identify following image : " + imageUrl);
-      /*
       if (doSimulate) {
         let simulatedAnswer = fs.readFileSync('./core/data/plantNetFrenchResponse.json');
         cb(false, JSON.parse(simulatedAnswer));
         return;
       }
-      */
       // https://my.plantnet.org/account/doc // v2
       superagent.get(MYPLANTNET_API_URL)
       .query({
@@ -72,38 +71,50 @@ class MyPlantnetClient {
     let family =  aResult.species && aResult.species.family ? aResult.species.family.scientificNameWithoutAuthor : false;
     let commonNamesArray = aResult.species ? aResult.species.commonNames : false;
 
-    let infoOf = `Score de ${scorePercent}%`;
+    let infoOf = `(à ${scorePercent}%)`;
     if (scientificName) {
-      infoOf += ` - nom scientifique : ${scientificName}`;
+      infoOf += ` ${scientificName}`;
     }
     if (family) {
-      infoOf += ` - famille: ${family}`;
+      infoOf += ` (fam ${family})`;
     }
     if (this.arrayWithContent(commonNamesArray)) {
         let commonNamesArrayStr = commonNamesArray.join(', ');
-        infoOf += ` - noms communs : ${commonNamesArrayStr}`;
+        infoOf += ` com. ${commonNamesArrayStr}`;
     }
     return infoOf;
   }
 
-  resultImageOf(aResult) {
+  resultImageOf(aResult, cb) {
     if (!aResult) {
-      return false;
+      cb(false);
+      return;
     }
     let firstImage = aResult.images && aResult.images[0] ? aResult.images[0] : false;
     if (!firstImage) {
-      return false;
+      cb(false);
+      return;
     }
+    let pnClient = this;
     let firstImageUrl = firstImage.url ? firstImage.url : {};
     let imageUrl = firstImageUrl.o ? firstImageUrl.o : firstImageUrl.m ? firstImageUrl.m : firstImageUrl.s;
-    let imageCredits = firstImage.citation ? firstImage.citation : firstImage.author;
+    TinyURL.shorten(imageUrl, function(res, err) {
+        if (err) {
+            cb(pnClient.resultImageOfMessage(firstImage, imageUrl));
+        }
+        cb(pnClient.resultImageOfMessage(firstImage, res));
+    });
+  }
+
+  resultImageOfMessage(firstImage, shortenUrl) {
+    let imageCredits = firstImage.author; // firstImage.citation is too long for a tweet constraint
     let imageOrgan = firstImage.organ === 'flower' ? "fleur" :
                      firstImage.organ === 'leaf' ? 'feuille' : false;
     let imageOf = imageCredits;
     if (imageOrgan) {
         imageOf = `${imageOrgan} - ${imageOf}`;
     }
-    return `${imageOf}\n${imageUrl}`;
+    return `${imageOf}\n${shortenUrl}`;
   }
 
   hasScoredResult(plantnetResponse, minimalScore) {
