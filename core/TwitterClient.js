@@ -101,7 +101,7 @@ class TwitterClient {
           this.logInfo("POST statuses/update "+ JSON.stringify(params) + " - result" + data);
           cb(false, data);
         } else {
-          logError("POST statuses/update:" + JSON.stringify(params) + " - err:" + err);
+          this.logError("POST statuses/update:" + JSON.stringify(params) + " - err:" + err);
           cb(err);
         }
       });
