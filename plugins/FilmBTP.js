@@ -81,7 +81,7 @@ class FilmBTP {
     let noRetweet = " -filter:retweets";
     let fromMe = " from:botEnTrain1";
     let notMe = " -from:botEnTrain1";
-    let searchQueryFromMe = "\"" + behavior.search + "\"" + noRetweet + fromMe;
+    let searchQueryFromMe = "\"" + behavior.reply + "\"" + noRetweet + fromMe;
     plugin.twitterClient.search(searchQueryFromMe, 200, (err,tweets) => {
         let mentioned = [];
         if (!err) {// get already mentioned users
