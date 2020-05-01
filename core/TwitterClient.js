@@ -3,12 +3,13 @@ const dateFormat = require('dateformat');
 const Twit = require('twit');
 const log4js = require('log4js');
 
-const TWEET_MAX_LENGTH=280;
+const TWEET_MAX_LENGTH = 280;
+const TWEET_QUERY_MAX_LENGTH = 500;
 
 class TwitterClient {
   constructor() {
     this.logger = log4js.getLogger('TwitterClient');
-    this.logger.setLevel('INFO'); // DEBUG will show api params
+    this.logger.setLevel('DEBUG'); // DEBUG will show api params
     if (!process.env.APPLICATION_CONSUMER_KEY_HERE ||
     !process.env.APPLICATION_CONSUMER_SECRET_HERE ||
     !process.env.ACCESS_TOKEN_HERE ||
@@ -73,6 +74,11 @@ class TwitterClient {
   search(searchQuery, searchCount, extendedMode, cb) {
       // Search parameters
       // doc: https://developer.twitter.com/en/docs/tweets/rules-and-filtering/overview/standard-operators
+      if (!searchQuery || searchQuery.length > TWEET_QUERY_MAX_LENGTH) {
+        cb("Invalid searchQuery (max " + TWEET_QUERY_MAX_LENGTH + ") - searchQuery " +
+          (searchQuery ? searchQuery.length + " - " + searchQuery : "(not set)"));
+        return;
+      }
       let params = {
         q: searchQuery,
         count: searchCount,
@@ -89,7 +95,7 @@ class TwitterClient {
           this.logger.debug("GET search/tweets:" + JSON.stringify(params) + " - result count:" + tweets.length);
           cb(false, tweets);
         } else {
-          this.logger.error("GET search/tweets:" + params + " - err:" + err);
+          this.logger.error("GET search/tweets:" + JSON.stringify(params) + " - err:" + err);
           cb(err);
         }
       });
@@ -202,6 +208,21 @@ class TwitterClient {
     } catch (err) {
         return false;
     }
+  }
+
+  // return tweeter screen names of user_mentions
+  tweetUserMentionsNames(tweet) {
+    this.logger.debug("tweetUserMentionsNames " + JSON.stringify(tweet));
+    if(!tweet || !tweet.entities || !tweet.entities.user_mentions) {
+      this.logger.debug("tweetUserMentionsNames => []");
+      return [];
+    }
+    let mentionNames = [];
+    tweet.entities.user_mentions.forEach((m) => {
+        mentionNames.push(m.screen_name);
+    });
+    this.logger.debug("tweetUserMentionsNames => " + mentionNames);
+    return mentionNames;
   }
 
   toLocaleDate(twitterDate) {
