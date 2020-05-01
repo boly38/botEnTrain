@@ -1,14 +1,12 @@
 # botEnTrain1
-
 Written in JavaScript for node.js this project is a Twitter bot.
 
-- Twitter account : https://twitter.com/botEnTrain1
-- Bot webPage : https://botentrain.herokuapp.com/
+- Twitter account : [@botentrain1](https://twitter.com/botEnTrain1)
+- Bot webPage : [botentrain.herokuapp.com](https://botentrain.herokuapp.com/)
 
 ## Bot features (plugins)
 
-- `FilmBTP` - reply to some french film quotes, with a youtube video
-- (some other are planned)
+- [botentrain.herokuapp.com/aide](https://botentrain.herokuapp.com/aide)
 
 ## Quick start
 
@@ -57,5 +55,7 @@ Application and code structure:
 Services
 - [Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs) hosting and automated review,deployments
 - [Cron-job.org](https://cron-job.org/) scheduler
+- [Travis-ci.org](https://www.travis-ci.org/) - CI - [![Build Status](https://www.travis-ci.org/boly38/botEnTrain.svg?branch=master)](https://www.travis-ci.org/boly38/botEnTrain)
 
-Team: cf. [contributors](https://github.com/boly38/botEnTrain/graphs/contributors)
+Team: 
+- cf. [contributors](https://github.com/boly38/botEnTrain/graphs/contributors)
