@@ -7,7 +7,7 @@ const TWEET_MAX_LENGTH=280;
 
 class TwitterClient {
   constructor() {
-    this.logger = log4js.getLogger();
+    this.logger = log4js.getLogger('TwitterClient');
     this.logger.setLevel('INFO'); // DEBUG will show api params
     if (!process.env.APPLICATION_CONSUMER_KEY_HERE ||
     !process.env.APPLICATION_CONSUMER_SECRET_HERE ||
@@ -29,7 +29,7 @@ class TwitterClient {
   // https://developer.twitter.com/en/docs/tweets/post-and-engage/overview
   //   GET statuses/show/:id
   //   https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-show-id
-  getTweetDetails(tweetId) {
+  getTweetDetails(tweetId, cb) {
       let params = {
         "id": tweetId,
         "tweet_mode":"extended"
@@ -37,12 +37,35 @@ class TwitterClient {
         // useless "include_entities": true,
       this.twit.get('statuses/show', params, (err, data, response) => {
         if(!err){
-          this.logDebug("GET statuses/show:" + JSON.stringify(params) + " - result:" +
+          this.logger.debug("GET statuses/show:" + JSON.stringify(params) + " - result:" +
             JSON.stringify(data));
-          // cb(false, tweets);
+            cb(false, data);
         } else {
-          this.logError("GET statuses/show:" + params + " - err:" + err);
-          // cb(err);
+          this.logger.error("GET statuses/show:" + params + " - err:" + err);
+          cb(err);
+        }
+      });
+  }
+
+  userTimeline(userName, searchCount, extendedMode, cb) {
+      // doc: https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline
+      let params = {
+        screen_name: userName,
+        exclude_replies: false,
+        count: searchCount
+      };
+      if (extendedMode) {
+        params.tweet_mode = "extended";
+      }
+
+      this.twit.get('statuses/user_timeline', params, (err, data, response) => {
+        if(!err){
+          let tweets = data;
+          this.logger.debug("GET statuses/user_timeline:" + JSON.stringify(params) + " - result count:" + tweets.length);
+          cb(false, tweets);
+        } else {
+          this.logger.error("GET statuses/user_timeline:" + params + " - err:" + err);
+          cb(err);
         }
       });
   }
@@ -53,9 +76,9 @@ class TwitterClient {
       let params = {
         q: searchQuery,
         count: searchCount,
-        result_type: 'recent',
-        lang: 'fr'
       };
+      params.result_type = 'recent'; // 'mixed';
+      params.lang = 'fr';
       if (extendedMode) {
         params.tweet_mode = "extended";
       }
@@ -63,10 +86,10 @@ class TwitterClient {
       this.twit.get('search/tweets', params, (err, data, response) => {
         if(!err){
           let tweets = data.statuses;
-          this.logDebug("GET search/tweets:" + JSON.stringify(params) + " - result count:" + tweets.length);
+          this.logger.debug("GET search/tweets:" + JSON.stringify(params) + " - result count:" + tweets.length);
           cb(false, tweets);
         } else {
-          this.logError("GET search/tweets:" + params + " - err:" + err);
+          this.logger.error("GET search/tweets:" + params + " - err:" + err);
           cb(err);
         }
       });
@@ -85,9 +108,9 @@ class TwitterClient {
         status: replyStatus
       };
 
-      this.logDebug("Uses params to reply to : " + JSON.stringify(params));
-      this.logInfo(`Plan to reply(${replyLength}) to => ` + this.tweetLinkOf(tweet));
-      this.logInfo(" " + this.tweetInfoOf(tweet));
+      this.logger.debug("Uses params to reply to : " + JSON.stringify(params));
+      this.logger.info(`Plan to reply(${replyLength}) to => ` + this.tweetLinkOf(tweet));
+      this.logger.info(" " + this.tweetInfoOf(tweet));
 
       if (doSimulate) {
           cb(false, {
@@ -106,13 +129,35 @@ class TwitterClient {
       }
       this.twit.post('statuses/update', params, (err, data, res) => {
         if(!err){
-          this.logInfo("POST statuses/update "+ JSON.stringify(params) + " - result" + data);
+          this.logger.info("POST statuses/update "+ JSON.stringify(params) + " - result" + data);
           cb(false, data);
         } else {
-          this.logError("POST statuses/update:" + JSON.stringify(params) + " - err:" + err);
+          this.logger.error("POST statuses/update:" + JSON.stringify(params) + " - err:" + err);
           cb(err);
         }
       });
+  }
+
+  getRecentlyMentionedUsers(userName, count, cb) {
+    let extendedMode = true;
+    this.userTimeline(userName, count, !extendedMode, (err,tweets) => {
+      let mentioned = [];
+      if (err) {
+        cb(err);
+        return;
+      }
+      // this.logger.debug(JSON.stringify(tweets));
+      tweets.forEach((t) => {
+          if (!t.entities || !t.entities.user_mentions) {
+            return;
+          }
+          t.entities.user_mentions.forEach((mention) => {
+              mentioned.push(mention.screen_name);
+          });
+      });
+      cb(false, mentioned);
+      return;
+    });
   }
 
   tweetLinkOf(tweet) {
@@ -165,16 +210,6 @@ class TwitterClient {
     } catch (err) {
       return twitterDate;
     }
-  }
-
-  logError(msg) {
-    this.logger.error("TwitterClient | " + msg);
-  }
-  logInfo(msg) {
-    this.logger.info("TwitterClient | " + msg);
-  }
-  logDebug(msg) {
-    this.logger.debug("TwitterClient | " + msg);
   }
 }
 

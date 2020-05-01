@@ -3,20 +3,20 @@ const log4js = require('log4js');
 
 const PLANTNET_MINIMAL_PERCENT = 60;
 const PLANTNET_MINIMAL_RATIO = PLANTNET_MINIMAL_PERCENT / 100;
-const PLANTNET_SIMULATE = false;
+const PLANTNET_SIMULATE = process.env.PLANTNET_SIMULATE || false;
 
 class PlantnetBTP {
   constructor(twitterClient, plantnetClient) {
     this.isAvailable = false;
-    this.logger = log4js.getLogger();
+    this.logger = log4js.getLogger('PlantnetBTP');
     this.logger.setLevel('DEBUG'); // DEBUG will show search results
     this.twitterClient = twitterClient;
     this.plantnetClient = plantnetClient;
     try {
         this.isAvailable = plantnetClient.isReady();
-        this.logInfo(this.isAvailable ? "available" : "not available");
+        this.logger.info(this.isAvailable ? "available" : "not available");
     } catch (exception) {
-        this.logError(exception);
+        this.logger.error(exception);
     }
   }
 
@@ -25,21 +25,31 @@ class PlantnetBTP {
   }
 
   getPluginTags() {
-    return ["#BetPlantnet","#IndentificationDePlantes"];
+    return ["#BetPlantnet","#IndentificationDePlantes"].join(' ');
   }
 
   isReady() {
     return this.isAvailable;
   }
 
+  _debugTweet() {
+      let tweetId = "11223344";
+      this.twitterClient.getTweetDetails(tweetId, (err, data) => {
+          this.logger.error(err);
+          this.logger.info(data);
+      });
+  }
+
   process(doSimulate, cb) {
+    // DEBUG // this._debugTweet(); return;
+
     let question = "(\"quelle est cette plante\" OR \"quelle est cette fleur\")";
     let noArbre = " -arbre";
     let withImage = " filter:media filter:images";
     let plantnetSearch = question + noArbre + withImage;
     this.searchTweets(plantnetSearch, (err, tweets) => {
         if (err) {
-            this.logError(err);
+            this.logger.error(err);
             cb({ "message": "impossible de chercher des tweets", "status": 500});
             return;
         }
@@ -49,7 +59,7 @@ class PlantnetBTP {
             debugLog += "\n\t" + this.twitterClient.tweetLinkOf(t) + "\n\t\t" + this.twitterClient.tweetInfoOf(t);
             // debugLog += JSON.stringify(t) ;
         });
-        this.logDebug("search results " + debugLog);
+        this.logger.debug("search results " + debugLog);
         */
         let tweetCandidate = this.randomFromArray(tweets);
         if (!tweetCandidate) {
@@ -58,7 +68,7 @@ class PlantnetBTP {
             return;
         }
         let candidateImage = this.twitterClient.tweetFirstMediaUrl(tweetCandidate);
-        this.logDebug("tweetCandidate : " +
+        this.logger.debug("tweetCandidate : " +
             this.twitterClient.tweetLinkOf(tweetCandidate) + "\n\t" +
             this.twitterClient.tweetInfoOf(tweetCandidate) + "\n\t" +
             "first media url : " + candidateImage + "\n");
@@ -68,16 +78,16 @@ class PlantnetBTP {
                  "status": 202});
             return;
         }
-        this.logDebug("candidateImage : " + candidateImage);
+        this.logger.debug("candidateImage : " + candidateImage);
 
         this.plantnetClient.identify(candidateImage, PLANTNET_SIMULATE, (err, plantResult) => {
             if (err) {
-                this.logError(err);
+                this.logger.error(err);
                 cb({"message": "impossible d'identifier l'image", "status": 500});
                 return;
             }
 
-            // this.logDebug("plantnetResult : " + JSON.stringify(plantResult));
+            // this.logger.debug("plantnetResult : " + JSON.stringify(plantResult));
 
             let firstScoredResult = this.plantnetClient.hasScoredResult(plantResult, PLANTNET_MINIMAL_RATIO);
             if (!firstScoredResult) {
@@ -100,7 +110,7 @@ class PlantnetBTP {
 
       this.replyTweet(doSimulate, tweetCandidate, replyMessage, (err, replyTweet) => {
           if (err) {
-              this.logError(err);
+              this.logger.error(err);
               cb({"message": "impossible de répondre au tweet", "status": 500});
               return;
           }
@@ -125,7 +135,7 @@ class PlantnetBTP {
       " mais cela n'a pas donné de résultat concluant (score>" + PLANTNET_MINIMAL_PERCENT + "%).\n:(\n";
       this.replyTweet(doSimulate, tweetCandidate, replyMessage, (err, replyTweet) => {
           if (err) {
-              this.logError(err);
+              this.logger.error(err);
               cb({"message": "impossible de répondre au tweet", "status": 500});
               return;
           }
@@ -147,30 +157,23 @@ class PlantnetBTP {
   searchTweets(plantnetSearch, cb) {
     let plugin = this;
     let noRetweet = " -filter:retweets";
-    let fromMe = " from:botEnTrain1";
     let notMe = " -from:botEnTrain1";
-    let searchQueryFromMe = this.getPluginTags()[0] + noRetweet + fromMe;
     let extendedMode = true;
-    plugin.twitterClient.search(searchQueryFromMe, 200, !extendedMode, (err,tweets) => {
-        let mentioned = [];
-        if (!err) {// get already mentioned users
-            tweets.forEach((t) => {
-                if (!t.entities || !t.entities.user_mentions) {
-                  return;
-                }
-                t.entities.user_mentions.forEach((mention) => {
-                    mentioned.push(mention.screen_name);
-                });
-            });
-            if (plugin.arrayWithContent(mentioned)) {
-              plugin.logDebug("Exclude already mentioned users => " + mentioned.join(', '));
-            }
+    plugin.logger.debug("get already mentioned users");
+    plugin.twitterClient.getRecentlyMentionedUsers("botEnTrain1", 200, (err, mentionedUsers) => {
+        if (err) {
+            plugin.logger.warn("Unable to search mentioned users " + JSON.stringify(err));
+            cb(err);
+            return;
+        }
+        if (plugin.arrayWithContent(mentionedUsers)) {
+          plugin.logger.debug("Exclude already mentioned users => " + mentionedUsers.join(', '));
         }
         let searchQueryNotMe = plantnetSearch + noRetweet + notMe;
-        mentioned.forEach((mentionedUser) => {// exclude alreadyMentioned
+        mentionedUsers.forEach((mentionedUser) => {// exclude alreadyMentioned
             searchQueryNotMe += " -from:" + mentionedUser;
         });
-        plugin.twitterClient.search(searchQueryNotMe, 20, extendedMode, cb);
+        plugin.twitterClient.search(searchQueryNotMe, 50, extendedMode, cb);
     });
   }
 
@@ -188,16 +191,6 @@ class PlantnetBTP {
 
   arrayWithContent(arr) {
     return (Array.isArray(arr) && arr.length > 0);
-  }
-
-  logDebug(msg) {
-    this.logger.debug(this.getPluginTags() + " | " + msg);
-  }
-  logInfo(msg) {
-    this.logger.info(this.getPluginTags() + " | " + msg);
-  }
-  logError(msg) {
-    this.logger.error(this.getPluginTags() + " | " + msg);
   }
 }
 
