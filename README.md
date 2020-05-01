@@ -6,7 +6,8 @@ Written in JavaScript for node.js this project is a Twitter bot.
 
 ## Bot features (plugins)
 
-- [botentrain.herokuapp.com/aide](https://botentrain.herokuapp.com/aide)
+- French help - cf. [botentrain.herokuapp.com/aide](https://botentrain.herokuapp.com/aide)
+- English [releases notes](https://github.com/boly38/botEnTrain/releases)  - via [![Automated Release Notes by gren](https://img.shields.io/badge/%F0%9F%A4%96-release%20notes-00B2EE.svg)](https://github-tools.github.io/github-release-notes/)
 
 ## Quick start
 
