@@ -5,7 +5,7 @@
   "main": "bet.js",
   "scripts": {
     "start": "node bet.js",
-    "test": "node test.js"
+    "test": "mocha --reporter spec"
   },
   "repository": {
     "type": "git",
@@ -23,11 +23,13 @@
     "url": "https://github.com/boly38/botEnTrain/issues"
   },
   "dependencies": {
+    "chai": "^4.2.0",
     "dateformat": "^3.0.3",
     "ejs": "^3.1.2",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "log4js": "^0.6.28",
+    "mocha": "^7.1.2",
     "superagent": "^5.2.2",
     "tinyurl": "^1.1.5",
     "twit": "^2.2.11"

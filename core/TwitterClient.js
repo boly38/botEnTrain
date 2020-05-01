@@ -1,4 +1,3 @@
-/*jshint esversion: 6 */
 const dateFormat = require('dateformat');
 const Twit = require('twit');
 const log4js = require('log4js');

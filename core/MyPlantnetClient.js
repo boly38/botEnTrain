@@ -1,4 +1,3 @@
-/*jshint esversion: 6 */
 var log4js = require('log4js');
 const fs = require('fs');
 const superagent = require('superagent');

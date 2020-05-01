@@ -1,4 +1,3 @@
-/*jshint esversion: 6 */
 const log4js = require('log4js');
 const TwitterClient = require('./TwitterClient.js');
 const MyPlantnetClient = require('./MyPlantnetClient.js');
