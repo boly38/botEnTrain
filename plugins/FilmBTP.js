@@ -5,16 +5,16 @@ const fs = require('fs');
 class FilmBTP {
   constructor(twitterClient) {
     this.isAvailable = false;
-    this.logger = log4js.getLogger();
+    this.logger = log4js.getLogger('FilmBTP');
     this.logger.setLevel('DEBUG'); // DEBUG will show search results
     this.twitterClient = twitterClient;
     try {
         let behaviorsData = fs.readFileSync('plugins/data/filmBtp.json');
         this.behaviors = JSON.parse(behaviorsData);
         this.isAvailable = true;
-        this.logInfo("available with " + this.behaviors.length + " behaviors");
+        this.logger.info("available with " + this.behaviors.length + " behaviors");
     } catch (exception) {
-        this.logError(exception);
+        this.logger.error(exception);
     }
   }
 
@@ -23,7 +23,7 @@ class FilmBTP {
   }
 
   getPluginTags() {
-    return ["#BetFilm","#RepliquesDeFilms"];
+    return ["#BetFilm","#RepliquesDeFilms"].join(' ');
   }
 
   isReady() {
@@ -34,7 +34,7 @@ class FilmBTP {
     let behavior = this.randomFromArray(this.behaviors);
     let tweets = this.searchTweets(behavior, (err, tweets) => {
         if (err) {
-            this.logError(err);
+            this.logger.error(err);
             cb({ "message": "impossible de chercher des tweets", "status": 500});
             return;
         }
@@ -44,12 +44,12 @@ class FilmBTP {
             debugLog += "\n\t" + this.twitterClient.tweetLinkOf(t) + "\n\t\t" + this.twitterClient.tweetInfoOf(t);
             // debugLog += JSON.stringify(t) ;
         });
-        this.logDebug("search results " + debugLog);
+        this.logger.debug("search results " + debugLog);
         */
         let filteredTweets = tweets.filter((t) => {
             return t.text && t.text.includes(behavior.search);
         });
-        this.logInfo("choose a tweet from results q:" + behavior.search +
+        this.logger.info("choose a tweet from results q:" + behavior.search +
          " results:" + tweets.length +
          " filtered:" + filteredTweets.length);
         let tweetCandidate = this.randomFromArray(filteredTweets);
@@ -60,7 +60,7 @@ class FilmBTP {
         }
         this.replyTweet(doSimulate, tweetCandidate, behavior, (err, replyTweet) => {
             if (err) {
-                this.logError(err);
+                this.logger.error(err);
                 cb({"message": "impossible de répondre au tweet", "status": 500});
                 return;
             }
@@ -99,7 +99,7 @@ class FilmBTP {
                 });
             });
             if (plugin.arrayWithContent(mentioned)) {
-              plugin.logDebug("Exclude already mentioned users => " + mentioned.join(', '));
+              plugin.logger.debug("Exclude already mentioned users => " + mentioned.join(', '));
             }
         }
         let searchQueryNotMe = "\"" + behavior.search + "\"" + noRetweet + notMe;
@@ -128,16 +128,6 @@ class FilmBTP {
 
   arrayWithContent(arr) {
     return (Array.isArray(arr) && arr.length > 0);
-  }
-
-  logDebug(msg) {
-    this.logger.debug(this.getPluginTags() + " | " + msg);
-  }
-  logInfo(msg) {
-    this.logger.info(this.getPluginTags() + " | " + msg);
-  }
-  logError(msg) {
-    this.logger.error(this.getPluginTags() + " | " + msg);
   }
 }
 

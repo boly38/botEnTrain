@@ -12,7 +12,7 @@ class MyPlantnetClient {
 
   constructor() {
     this.isAvailable = false;
-    this.logger = log4js.getLogger();
+    this.logger = log4js.getLogger('MyPlantnetClient');
     this.logger.setLevel('INFO'); // DEBUG will show api params
 
     try {
@@ -21,9 +21,9 @@ class MyPlantnetClient {
         }
         this.apiKey = process.env.MYPLANTNET_API_PRIVATE_KEY;
         this.isAvailable = true;
-        this.logInfo("available");
+        this.logger.info("available");
     } catch (exception) {
-        this.logError(exception);
+        this.logger.error(exception);
     }
   }
 
@@ -32,7 +32,7 @@ class MyPlantnetClient {
   }
 
   identify(imageUrl, doSimulate, cb) {
-      this.logInfo("identify following image : " + imageUrl);
+      this.logger.info("identify following image : " + imageUrl);
       if (doSimulate) {
         let simulatedAnswer = fs.readFileSync('./core/data/plantNetFrenchResponse.json');
         cb(false, JSON.parse(simulatedAnswer));
@@ -53,7 +53,7 @@ class MyPlantnetClient {
           let errError = err.message;
           let errDetails = err.response.text;
           let errResult = "Pla@ntnet identify error (" + errStatus + ") " + errError;
-          this.logError(errResult + " - details:" + errDetails);
+          this.logger.error(errResult + " - details:" + errDetails);
           cb(errResult);
           return;
         }
@@ -128,16 +128,6 @@ class MyPlantnetClient {
 
   arrayWithContent(arr) {
     return (Array.isArray(arr) && arr.length > 0);
-  }
-
-  logError(msg) {
-    this.logger.error("MyPlantnetClient | " + msg);
-  }
-  logInfo(msg) {
-    this.logger.info("MyPlantnetClient | " + msg);
-  }
-  logDebug(msg) {
-    this.logger.debug("MyPlantnetClient | " + msg);
   }
 }
 
