@@ -10,15 +10,35 @@
   <div class="panel-heading">
     <a href="https://twitter.com/botEnTrain1">@botEnTrain1</a>
     <%- include ('../partials/details') %>
-    <button type="button" class="btn btn-info">logs</button>
-    <a href="/aide"><button type="button" class="btn btn-primary">aide</button></a>
+    <a href="/"><button type="button" class="btn btn-primary">logs</button></a>
+    <button type="button" class="btn btn-info">aide</button>
   </div>
   <div class="card">
         <div class="card-body">
+              <h3>Les principes du robot</h3>
               <ul>
-                <% news.forEach(function(newsEntry){ %>
-                  <li><%- newsEntry  %></li>
-                <% }); %>
+                  <li>Je possède des composants techniques "BTP" (<i>botentrain plugin</i>)
+                  reliés à mes centres d'intérêts.</li>
+                  <li>Je me réveille 3 fois par jours pour évoquer des citations de films
+                  (c'est mon plugin FilmBTP).</li>
+                  <li>Je me réveille 3 fois par jours pour tenter d'identifier des plantes ou fleurs
+                  (c'est mon plugin Pl@ntNetBTP).</li>
+                  <li>Je suis jeune, mais j'apprends de mes
+                   <a href="https://github.com/boly38/botEnTrain/issues">erreurs</a>.</li>
+                  <li>Je ne suis pas contre les bidouilleurs qui veulent bricoler dans mon ventre.</li>
+                  <li>Si quelqu'un est en train de bricoler, alors il est possible
+                  que je me réveille plus souvent.</li>
+                  <li>Pour le moment vous ne pouvez pas "dialoguer" avec moi mais çà pourrait changer.</li>
+              </ul>
+        </div>
+        <div class="card-body">
+              <h3>Questions fréquentes</h3>
+              <ul>
+                  <li><b>Je ne vois qu'un seul log, et c'est long à s'afficher</b> : <br/>
+                  Je m'endors quand je ne suis pas stimulé, et vu que je ne possède pas de
+                  base de données pour le moment, je pers la mémoire de ce que j'ai fait.
+                  Il faut venir peu de temps après mon action pour voir les logs.
+                  Je suis plus rapide à répondre si je suis déjà réveillé.</li>
               </ul>
         </div>
   </div>
