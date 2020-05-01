@@ -1,7 +1,8 @@
 /*jshint esversion: 6 */
 const log4js = require('log4js');
+const fs = require('fs');
 
-const PLANTNET_MINIMAL_PERCENT = 60;
+const PLANTNET_MINIMAL_PERCENT = 20;
 const PLANTNET_MINIMAL_RATIO = PLANTNET_MINIMAL_PERCENT / 100;
 const PLANTNET_SIMULATE = process.env.PLANTNET_SIMULATE || false;
 
@@ -13,8 +14,11 @@ class PlantnetBTP {
     this.twitterClient = twitterClient;
     this.plantnetClient = plantnetClient;
     try {
+        let questionsData = fs.readFileSync('plugins/data/questionsPlantnet.json');
+        this.questions = JSON.parse(questionsData);
         this.isAvailable = plantnetClient.isReady();
-        this.logger.info(this.isAvailable ? "available" : "not available");
+        this.logger.info((this.isAvailable ? "available" : "not available") +
+          " with " + this.questions.length + " questions");
     } catch (exception) {
         this.logger.error(exception);
     }
@@ -42,11 +46,10 @@ class PlantnetBTP {
 
   process(doSimulate, cb) {
     // DEBUG // this._debugTweet(); return;
-
-    let question = "(\"quelle est cette plante\" OR \"quelle est cette fleur\")";
+    let allQuestions = "(\"" + this.questions.join("\" OR \"") + "\")";
     let noArbre = " -arbre";
     let withImage = " filter:media filter:images";
-    let plantnetSearch = question + noArbre + withImage;
+    let plantnetSearch = allQuestions + noArbre + withImage;
     this.searchTweets(plantnetSearch, (err, tweets) => {
         if (err) {
             this.logger.error(err);
@@ -166,20 +169,37 @@ class PlantnetBTP {
             cb(err);
             return;
         }
-        if (plugin.arrayWithContent(mentionedUsers)) {
-          plugin.logger.debug("Exclude already mentioned users => " + mentionedUsers.join(', '));
-        }
+
         let searchQueryNotMe = plantnetSearch + noRetweet + notMe;
-        mentionedUsers.forEach((mentionedUser) => {// exclude alreadyMentioned
-            searchQueryNotMe += " -from:" + mentionedUser;
+        plugin.twitterClient.search(searchQueryNotMe, 50, extendedMode, (err, tweets) => {
+            if (err) {
+                cb(err);
+                return;
+            }
+            let filteredTweets = tweets;
+            if (plugin.arrayWithContent(mentionedUsers)) {
+              filteredTweets = plugin.filterMentionedUsers(tweets, mentionedUsers);
+              plugin.logger.debug("Exclude " + (tweets.length - filteredTweets.length) +
+               " already mentioned users => " + mentionedUsers.join(', '));
+            }
+            cb(false, filteredTweets);
         });
-        plugin.twitterClient.search(searchQueryNotMe, 50, extendedMode, cb);
     });
   }
 
   replyTweet(doSimulate, tweet, message, cb) {
     let replyMessage = message + "\n\n" + this.getPluginTags();
     this.twitterClient.replyTo(tweet, replyMessage, doSimulate, cb);
+  }
+
+  filterMentionedUsers(tweets, usersToFilter) {
+    if (!tweets) {
+      return [];
+    }
+    return tweets.filter((t) => {
+        let tweetAuthor = t.user ? t.user.screen_name : false;
+        return tweetAuthor && !usersToFilter.includes(tweetAuthor);
+    });
   }
 
   randomFromArray(arr) {

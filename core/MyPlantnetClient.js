@@ -32,8 +32,8 @@ class MyPlantnetClient {
   }
 
   identify(imageUrl, doSimulate, cb) {
-      this.logger.info("identify following image : " + imageUrl);
-      if (doSimulate) {
+      this.logger.info("identify following image : " + imageUrl + (doSimulate ? " SIMULATION " : ""));
+      if (doSimulate === 'true') {
         let simulatedAnswer = fs.readFileSync('./core/data/plantNetFrenchResponse.json');
         cb(false, JSON.parse(simulatedAnswer));
         return;
