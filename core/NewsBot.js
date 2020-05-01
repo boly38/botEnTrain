@@ -1,4 +1,3 @@
-/*jshint esversion: 6 */
 const dateFormat = require('dateformat');
 
 class NewsBot {
