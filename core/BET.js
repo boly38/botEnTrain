@@ -27,6 +27,8 @@ class BotEnTrain {
           .use(express.static(path.join(__dirname, '../public')))
           .set('views', path.join(__dirname, '../views'))
           .set('view engine', 'ejs')
+          .get('/aide',
+            (req, res) => res.render('pages/aide'))
           .get('/hook',
             (req, res) => bet.hookResponse(req, res))
           .get('/*',
