@@ -1,0 +1,5 @@
+node_modules/
+
+# locally
+.idea/
+drafts/

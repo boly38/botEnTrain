@@ -43,12 +43,18 @@ class PlantnetBTP {
       });
   }
 
-  process(doSimulate, cb) {
+  process(config, cb) {
+    let pluginName = config.pluginName ? config.pluginName : this.getName();
+    let pluginTags = config.pluginTags ? config.pluginTags : this.getPluginTags();
+    let doSimulate = config.doSimulate || false;
     // DEBUG // this._debugTweet(); return;
     let allQuestions = "(\"" + this.questions.join("\" OR \"") + "\")";
     let noArbre = " -arbre";
     let withImage = " filter:media filter:images";
     let plantnetSearch = allQuestions + noArbre + withImage;
+    if (config.searchExtra) {
+      plantnetSearch += " " + config.searchExtra;
+    }
     this.searchTweets(plantnetSearch, (err, tweets) => {
         if (err) {
             this.logger.error(err);
@@ -65,7 +71,7 @@ class PlantnetBTP {
         */
         let tweetCandidate = this.randomFromArray(tweets);
         if (!tweetCandidate) {
-            cb({ "message": "aucun candidat pour pl@ntnet",
+            cb({ "message": "aucun candidat pour " + pluginName,
                  "status": 202});
             return;
         }
@@ -93,10 +99,10 @@ class PlantnetBTP {
 
             let firstScoredResult = this.plantnetClient.hasScoredResult(plantResult, PLANTNET_MINIMAL_RATIO);
             if (!firstScoredResult) {
-                this.replyNoScoredResult(doSimulate, tweetCandidate, cb);
+                this.replyNoScoredResult(doSimulate, pluginTags, tweetCandidate, cb);
                 return;
             }
-            this.replyScoredResult(doSimulate, tweetCandidate, firstScoredResult, cb);
+            this.replyScoredResult(doSimulate, pluginTags, tweetCandidate, firstScoredResult, cb);
 
         }); // plantnetClient.identify end
 
@@ -104,11 +110,12 @@ class PlantnetBTP {
     });
   }
 
-  replyScoredResult(doSimulate, tweetCandidate, firstScoredResult, cb) {
+  replyScoredResult(doSimulate, pluginTags, tweetCandidate, firstScoredResult, cb) {
     this.plantnetClient.resultImageOf(firstScoredResult, (illustrateImage) => {
       let replyMessage = "Pl@ntnet identifie " +
       this.plantnetClient.resultInfoOf(firstScoredResult) + "\n" +
-      (illustrateImage ? "\n\n" + illustrateImage : "");
+      (illustrateImage ? "\n\n" + illustrateImage : "") + "\n\n" +
+      pluginTags;
 
       this.replyTweet(doSimulate, tweetCandidate, replyMessage, (err, replyTweet) => {
           if (err) {
@@ -132,9 +139,10 @@ class PlantnetBTP {
     });
   }
 
-  replyNoScoredResult(doSimulate, tweetCandidate, cb) {
+  replyNoScoredResult(doSimulate, pluginTags, tweetCandidate, cb) {
       let replyMessage = "Bonjour, j'ai interrogé Pl@ntnet pour tenter d'identifier votre première image" +
-      " mais cela n'a pas donné de résultat concluant (score>" + PLANTNET_MINIMAL_PERCENT + "%).\n:(\n";
+      " mais cela n'a pas donné de résultat concluant (score>" + PLANTNET_MINIMAL_PERCENT + "%).\n:(\n\n" +
+      pluginTags;
       this.replyTweet(doSimulate, tweetCandidate, replyMessage, (err, replyTweet) => {
           if (err) {
               this.logger.error(err);
@@ -176,7 +184,7 @@ class PlantnetBTP {
                 return;
             }
             let filteredTweets = tweets;
-            if (plugin.arrayWithContent(mentionedUsers)) {
+            if (plugin.arrayWithContent(tweets) && plugin.arrayWithContent(mentionedUsers)) {
               filteredTweets = plugin.filterMentionedUsers(tweets, mentionedUsers);
               plugin.logger.debug("Exclude " + (tweets.length - filteredTweets.length) +
                " already mentioned users => " + mentionedUsers.join(', '));
@@ -186,8 +194,7 @@ class PlantnetBTP {
     });
   }
 
-  replyTweet(doSimulate, tweet, message, cb) {
-    let replyMessage = message + "\n\n" + this.getPluginTags();
+  replyTweet(doSimulate, tweet, replyMessage, cb) {
     this.twitterClient.replyTo(tweet, replyMessage, doSimulate, cb);
   }
 

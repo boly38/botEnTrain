@@ -32,7 +32,10 @@ class BotEnTrain {
           .get('/hook',
             (req, res) => bet.hookResponse(req, res))
           .get('/*',
-            (req, res) => res.render('pages/index', {"news": bet.newsBot.getNews() }))
+            (req, res) => res.render('pages/index', {
+                "news": bet.newsBot.getNews(),
+                "status": bet.getState(),
+            }))
           .listen(bet.port, () => console.log(`Listening on ${ bet.port }`));
     }
 
@@ -82,6 +85,10 @@ class BotEnTrain {
         return new Date().toLocaleString('fr-FR', {
            timeZone: 'Europe/Paris'
         });
+    }
+
+    getState() {
+      return this.botEngine ? this.botEngine.getState() : "Inactif";
     }
 }
 
