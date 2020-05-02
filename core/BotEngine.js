@@ -3,6 +3,7 @@ const TwitterClient = require('./TwitterClient.js');
 const MyPlantnetClient = require('./MyPlantnetClient.js');
 const FilmBTP = require('../plugins/FilmBTP');
 const PlantnetBTP = require('../plugins/PlantnetBTP');
+const DialogBTP = require('../plugins/DialogBTP');
 
 const ENGINE_MIN_INTERVAL_MS=10000;// min each 10 seconds
 
@@ -21,8 +22,11 @@ class BotEngine {
   run() {
     let engine = this;
     let filmBTP = new FilmBTP(engine.twitterClient);
+    let plantnetBTP = new PlantnetBTP(engine.twitterClient, engine.plantnetClient);
+    let dialogBTP = new DialogBTP(plantnetBTP);
     engine.plugins.push(filmBTP);
-    engine.plugins.push(new PlantnetBTP(engine.twitterClient, engine.plantnetClient));
+    engine.plugins.push(plantnetBTP);
+    engine.plugins.push(dialogBTP);
     engine.defaultPlugin = filmBTP;
     engine.logger.info("started with " + engine.plugins.length +
        " plugin(s) and minInterval:" + this.intervalMs);
@@ -47,9 +51,10 @@ class BotEngine {
             "status": 503});
         return;
     }
-    engine.logger.info(remoteAdd + " | process right now - " + plugin.getName());
+    engine.logger.info(remoteAdd + " | process right now - " +
+      plugin.getName() + (doSimulate ? " SIMULATE" :""));
     engine.newsBot.add("Exécution du plugin - " + plugin.getName());
-    plugin.process(doSimulate, (err, result) => {
+    plugin.process({ "doSimulate" : doSimulate }, (err, result) => {
         if(err) {
           engine.logger.warn("plugin response status:" + err.status + " msg:" + err.message);
           engine.newsBot.add(err.message);
@@ -60,6 +65,15 @@ class BotEngine {
         engine.newsBot.add(result.html);
         cb(false, result.text);
     });
+  }
+
+  getState() {
+    let engine = this;
+    let pluginsNames = [];
+    engine.plugins.forEach((p) => {
+        pluginsNames.push(p.getName());
+    });
+    return "Plugins : " + pluginsNames.join(", ");
   }
 
   getPluginByName(pluginName) {

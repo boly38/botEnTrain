@@ -29,7 +29,8 @@ class FilmBTP {
     return this.isAvailable;
   }
 
-  process(doSimulate, cb) {
+  process(config, cb) {
+    let doSimulate = config.doSimulate || false;
     let behavior = this.randomFromArray(this.behaviors);
     let tweets = this.searchTweets(behavior, (err, tweets) => {
         if (err) {
