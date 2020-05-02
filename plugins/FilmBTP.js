@@ -1,6 +1,8 @@
 const log4js = require('log4js');
 const fs = require('fs');
 
+const BEHAVIOR_TEST_INDEX = process.env.BEHAVIOR_TEST_INDEX || false;
+
 class FilmBTP {
   constructor(twitterClient) {
     this.isAvailable = false;
@@ -31,7 +33,8 @@ class FilmBTP {
 
   process(config, cb) {
     let doSimulate = config.doSimulate || false;
-    let behavior = this.randomFromArray(this.behaviors);
+    let behavior = BEHAVIOR_TEST_INDEX && this.behaviors.length > BEHAVIOR_TEST_INDEX ?
+        this.behaviors[BEHAVIOR_TEST_INDEX] : this.randomFromArray(this.behaviors);
     let tweets = this.searchTweets(behavior, (err, tweets) => {
         if (err) {
             this.logger.error(err);
