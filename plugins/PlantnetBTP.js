@@ -48,7 +48,7 @@ class PlantnetBTP {
     let pluginTags = config.pluginTags ? config.pluginTags : this.getPluginTags();
     let doSimulate = config.doSimulate || false;
     // DEBUG // this._debugTweet(); return;
-    let allQuestions = "(\"" + this.questions.join("\" OR \"") + "\")";
+    let allQuestions = "(\"" + this.questions.join("\" OR \"") + "\")" + " ?";
     let noArbre = " -arbre";
     let withImage = " filter:media filter:images";
     let plantnetSearch = allQuestions + noArbre + withImage;
@@ -141,7 +141,8 @@ class PlantnetBTP {
 
   replyNoScoredResult(doSimulate, pluginTags, tweetCandidate, cb) {
       let replyMessage = "Bonjour, j'ai interrogé Pl@ntnet pour tenter d'identifier votre première image" +
-      " mais cela n'a pas donné de résultat concluant (score>" + PLANTNET_MINIMAL_PERCENT + "%).\n:(\n\n" +
+      " mais cela n'a pas donné de résultat concluant 😩 (score>" + PLANTNET_MINIMAL_PERCENT + "%).\n" +
+      "Astuce: bien cadrer la fleur ou feuille\n\n" +
       pluginTags;
       this.replyTweet(doSimulate, tweetCandidate, replyMessage, (err, replyTweet) => {
           if (err) {

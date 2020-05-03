@@ -1,8 +1,10 @@
 [
-  "comment s’appelle cette plante",
-  "quelle est cette plante",
-  " nom de cette plante ?",
-  "comment s’appelle cette fleur",
-  "quelle est cette fleur",
-  " nom de cette fleur ?"
+  "appelle cette plante",
+  "est cette plante",
+  "nom de cette plante",
+  "identifier cette plante",
+  "appelle cette fleur",
+  "est cette fleur",
+  "nom de cette fleur",
+  "identifier cette fleur"
 ]
