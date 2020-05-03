@@ -70,6 +70,7 @@ class TwitterClient {
       });
   }
 
+  // search query operators : https://developer.twitter.com/en/docs/tweets/search/guides/standard-operators
   search(searchQuery, searchCount, extendedMode, cb) {
       // Search parameters
       // doc: https://developer.twitter.com/en/docs/tweets/rules-and-filtering/overview/standard-operators
