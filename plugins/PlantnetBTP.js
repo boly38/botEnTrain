@@ -90,8 +90,16 @@ class PlantnetBTP {
 
         this.plantnetClient.identify(candidateImage, PLANTNET_SIMULATE, (err, plantResult) => {
             if (err) {
-                this.logger.error(err);
-                cb({"message": "impossible d'identifier l'image", "status": 500});
+                this.logger.error(err.message);
+                if (err.status && err.status == 404) {
+                    this.replyNotFoundResult(doSimulate, pluginTags, tweetCandidate, cb);
+                    return;
+                }
+                cb({"message": "impossible d'identifier l'image",
+                    "html": "<b>Tweet</b>: <div class=\"bg-warning\">" +
+                    this.twitterClient.tweetHtmlOf(tweetCandidate) + "</div>" +
+                    " <b>Erreur</b>: impossible d'identifier l'image",
+                    "status": 500});
                 return;
             }
 
@@ -117,33 +125,27 @@ class PlantnetBTP {
       (illustrateImage ? "\n\n" + illustrateImage : "") + "\n\n" +
       pluginTags;
 
-      this.replyTweet(doSimulate, tweetCandidate, replyMessage, (err, replyTweet) => {
-          if (err) {
-              this.logger.error(err);
-              cb({"message": "impossible de répondre au tweet", "status": 500});
-              return;
-          }
-          cb(false, {
-              "html": "<b>Tweet</b>: <div class=\"bg-info\">" +
-                  this.twitterClient.tweetHtmlOf(tweetCandidate) + "</div>" +
-                  "<b>Réponse émise</b>: " +
-                  this.twitterClient.tweetHtmlOf(replyTweet),
-              "text": "\nTweet:\n\t" +
-                  this.twitterClient.tweetLinkOf(tweetCandidate) + "\n\t" +
-                  this.twitterClient.tweetInfoOf(tweetCandidate) + "\n" +
-                  "Reply sent:\n\t" +
-                  this.twitterClient.tweetLinkOf(replyTweet) + "\n\t" +
-                  this.twitterClient.tweetInfoOf(replyTweet) + "\n"
-          });
-      });
+      this.replyResult(doSimulate, tweetCandidate, replyMessage, cb);
     });
   }
+
+  replyNotFoundResult(doSimulate, pluginTags, tweetCandidate, cb) {
+      let replyMessage = "Bonjour, j'ai interrogé Pl@ntnet pour tenter d'identifier votre première image" +
+      " mais a priori il ne s'agit ni d'une plante ni d'une fleur 😏 ?\n" +
+      "Je me suis bien fait avoir 😊 !\n\n" +
+      pluginTags;
+      this.replyResult(doSimulate, tweetCandidate, replyMessage, cb);
+   }
 
   replyNoScoredResult(doSimulate, pluginTags, tweetCandidate, cb) {
       let replyMessage = "Bonjour, j'ai interrogé Pl@ntnet pour tenter d'identifier votre première image" +
       " mais cela n'a pas donné de résultat concluant 😩 (score>" + PLANTNET_MINIMAL_PERCENT + "%).\n" +
       "Astuce: bien cadrer la fleur ou feuille\n\n" +
       pluginTags;
+      this.replyResult(doSimulate, tweetCandidate, replyMessage, cb);
+  }
+
+  replyResult(doSimulate, tweetCandidate, replyMessage, cb) {
       this.replyTweet(doSimulate, tweetCandidate, replyMessage, (err, replyTweet) => {
           if (err) {
               this.logger.error(err);
