@@ -57,7 +57,7 @@ class BotEngine {
     plugin.process({ "doSimulate" : doSimulate }, (err, result) => {
         if(err) {
           engine.logger.warn("plugin response status:" + err.status + " msg:" + err.message);
-          engine.newsBot.add(err.message);
+          engine.newsBot.add(err.html ? err.html : err.message);
           cb(err);
           return;
         }

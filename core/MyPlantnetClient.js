@@ -53,7 +53,7 @@ class MyPlantnetClient {
           let errDetails = err.response.text;
           let errResult = "Pla@ntnet identify error (" + errStatus + ") " + errError;
           this.logger.error(errResult + " - details:" + errDetails);
-          cb(errResult);
+          cb({ message: errResult, status: errStatus });
           return;
         }
         cb(false, res.body);
