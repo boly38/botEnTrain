@@ -35,19 +35,11 @@ class PlantnetBTP {
     return this.isAvailable;
   }
 
-  _debugTweet() {
-      let tweetId = "11223344";
-      this.twitterClient.getTweetDetails(tweetId, (err, data) => {
-          this.logger.error(err);
-          this.logger.info(data);
-      });
-  }
 
   process(config, cb) {
     let pluginName = config.pluginName ? config.pluginName : this.getName();
     let pluginTags = config.pluginTags ? config.pluginTags : this.getPluginTags();
     let doSimulate = config.doSimulate || false;
-    // DEBUG // this._debugTweet(); return;
     let allQuestions = "(\"" + this.questions.join("\" OR \"") + "\")" + " ?";
     let noArbre = " -arbre";
     let withImage = " filter:media filter:images";

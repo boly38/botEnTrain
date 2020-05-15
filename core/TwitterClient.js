@@ -227,6 +227,30 @@ class TwitterClient {
     }
   }
 
+  tweetPhotosUrls(extendedTweet) {
+    try {
+        let photoUrls = this.entitiesPhotoUrls(extendedTweet.extended_entities);
+        if (this.arrayWithContent(photoUrls)) {
+          return photoUrls;
+        }
+        return this.entitiesPhotoUrls(extendedTweet.entities);
+    } catch (err) {
+        return false;
+    }
+  }
+
+  entitiesPhotoUrls(entities) {
+    let photoUrls = [];
+    if (entities && entities.media) {
+        entities.media
+            .filter((media) => media.type == "photo")
+            .forEach((media) => {
+                photoUrls.push(media.media_url_https)
+            });
+    }
+    return photoUrls;
+  }
+
   // return tweeter screen names of user_mentions
   tweetUserMentionsNames(tweet) {
     this.logger.debug("tweetUserMentionsNames " + JSON.stringify(tweet));
@@ -248,6 +272,10 @@ class TwitterClient {
     } catch (err) {
       return twitterDate;
     }
+  }
+
+  arrayWithContent(arr) {
+    return (Array.isArray(arr) && arr.length > 0);
   }
 }
 
