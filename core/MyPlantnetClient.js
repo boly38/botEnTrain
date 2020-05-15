@@ -1,4 +1,4 @@
-var log4js = require('log4js');
+const log4js = require('log4js');
 const fs = require('fs');
 const superagent = require('superagent');
 const queryString = require('querystring');

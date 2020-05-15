@@ -166,6 +166,23 @@ class TwitterClient {
     });
   }
 
+  getRecentlyAnsweredStatuses(userName, count, cb) {
+    let extendedMode = true;
+    this.userTimeline(userName, count, !extendedMode, (err,tweets) => {
+      let statusesIds = [];
+      if (err) {
+        cb(err);
+        return;
+      }
+      // this.logger.debug(JSON.stringify(tweets));
+      tweets.forEach((t) => {
+          statusesIds.push(t.in_reply_to_status_id_str);
+      });
+      cb(false, statusesIds);
+      return;
+    });
+  }
+
   tweetLinkOf(tweet) {
     if (!tweet) {
       return "";

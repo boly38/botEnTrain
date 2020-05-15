@@ -61,14 +61,9 @@ class PlantnetBTP {
             cb({ "message": "impossible de chercher des tweets", "status": 500});
             return;
         }
-        /*
-        let debugLog = "";
-        tweets.forEach((t) => {
-            debugLog += "\n\t" + this.twitterClient.tweetLinkOf(t) + "\n\t\t" + this.twitterClient.tweetInfoOf(t);
-            // debugLog += JSON.stringify(t) ;
-        });
-        this.logger.debug("search results " + debugLog);
-        */
+
+        //this._debugLogTweets(tweets);
+
         let tweetCandidate = this.randomFromArray(tweets);
         if (!tweetCandidate) {
             cb({ "message": "aucun candidat pour " + pluginName,
@@ -116,6 +111,15 @@ class PlantnetBTP {
 
 
     });
+  }
+
+  _debugLogTweets(tweets) {
+      let debugLog = "";
+      tweets.forEach((t) => {
+          debugLog += "\n\t" + this.twitterClient.tweetLinkOf(t) + "\n\t\t" + this.twitterClient.tweetInfoOf(t);
+          // debugLog += JSON.stringify(t) ;
+      });
+      this.logger.debug("tweets " + debugLog);
   }
 
   replyScoredResult(doSimulate, pluginTags, tweetCandidate, firstScoredResult, cb) {
@@ -172,10 +176,10 @@ class PlantnetBTP {
     let noRetweet = " -filter:retweets";
     let notMe = " -from:botEnTrain1";
     let extendedMode = true;
-    plugin.logger.debug("get already mentioned users");
-    plugin.twitterClient.getRecentlyMentionedUsers("botEnTrain1", 200, (err, mentionedUsers) => {
+    plugin.logger.debug("get recent answers");
+    plugin.twitterClient.getRecentlyAnsweredStatuses("botEnTrain1", 200, (err, recentAnswersIds) => {
         if (err) {
-            plugin.logger.warn("Unable to search mentioned users " + JSON.stringify(err));
+            plugin.logger.warn("Unable to search recent answers " + JSON.stringify(err));
             cb(err);
             return;
         }
@@ -187,10 +191,9 @@ class PlantnetBTP {
                 return;
             }
             let filteredTweets = tweets;
-            if (plugin.arrayWithContent(tweets) && plugin.arrayWithContent(mentionedUsers)) {
-              filteredTweets = plugin.filterMentionedUsers(tweets, mentionedUsers);
-              plugin.logger.debug("Exclude " + (tweets.length - filteredTweets.length) +
-               " already mentioned users => " + mentionedUsers.join(', '));
+            if (plugin.arrayWithContent(tweets) && plugin.arrayWithContent(recentAnswersIds)) {
+              filteredTweets = plugin.filterRecentAnswers(tweets, recentAnswersIds);
+              plugin.logger.debug("Exclude " + (tweets.length - filteredTweets.length));
             }
             cb(false, filteredTweets);
         });
@@ -201,13 +204,12 @@ class PlantnetBTP {
     this.twitterClient.replyTo(tweet, replyMessage, doSimulate, cb);
   }
 
-  filterMentionedUsers(tweets, usersToFilter) {
+  filterRecentAnswers(tweets, recentAnswersIds) {
     if (!tweets) {
       return [];
     }
     return tweets.filter((t) => {
-        let tweetAuthor = t.user ? t.user.screen_name : false;
-        return tweetAuthor && !usersToFilter.includes(tweetAuthor);
+        return !recentAnswersIds.includes(t.id_str);
     });
   }
 
