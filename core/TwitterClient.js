@@ -4,18 +4,14 @@ const log4js = require('log4js');
 
 const TWEET_MAX_LENGTH = 280;
 const TWEET_QUERY_MAX_LENGTH = 500;
+const TWITTER_EXCLUDED_ACCOUNTS = process.env.TWITTER_EXCLUDED_ACCOUNTS || false;
 
 class TwitterClient {
   constructor() {
     this.logger = log4js.getLogger('TwitterClient');
     this.logger.setLevel('DEBUG'); // DEBUG will show api params
-    if (!process.env.APPLICATION_CONSUMER_KEY_HERE ||
-    !process.env.APPLICATION_CONSUMER_SECRET_HERE ||
-    !process.env.ACCESS_TOKEN_HERE ||
-    !process.env.ACCESS_TOKEN_SECRET_HERE
-    ) {
-        throw "TwitterClient, please setup your environment";
-    }
+    this._assumeEnvironment();
+    this._assumeExcludeQuery();
     this.twit = new Twit({
       consumer_key: process.env.APPLICATION_CONSUMER_KEY_HERE,
       consumer_secret: process.env.APPLICATION_CONSUMER_SECRET_HERE,
@@ -72,15 +68,16 @@ class TwitterClient {
 
   // search query operators : https://developer.twitter.com/en/docs/tweets/search/guides/standard-operators
   search(searchQuery, searchCount, extendedMode, cb) {
+      var twitterQuery = searchQuery + this.excludeQuery;
       // Search parameters
       // doc: https://developer.twitter.com/en/docs/tweets/rules-and-filtering/overview/standard-operators
-      if (!searchQuery || searchQuery.length > TWEET_QUERY_MAX_LENGTH) {
-        cb("Invalid searchQuery (max " + TWEET_QUERY_MAX_LENGTH + ") - searchQuery " +
-          (searchQuery ? searchQuery.length + " - " + searchQuery : "(not set)"));
+      if (!twitterQuery || twitterQuery.length > TWEET_QUERY_MAX_LENGTH) {
+        cb("Invalid query (max " + TWEET_QUERY_MAX_LENGTH + "): " +
+          (twitterQuery ? twitterQuery.length + " - " + twitterQuery : "(not set)"));
         return;
       }
       let params = {
-        q: searchQuery,
+        q: twitterQuery,
         count: searchCount,
       };
       params.result_type = 'recent'; // 'mixed';
@@ -249,6 +246,25 @@ class TwitterClient {
       return twitterDate;
     }
   }
+
+  // ~ private
+  _assumeEnvironment() {
+    if (!process.env.APPLICATION_CONSUMER_KEY_HERE ||
+    !process.env.APPLICATION_CONSUMER_SECRET_HERE ||
+    !process.env.ACCESS_TOKEN_HERE ||
+    !process.env.ACCESS_TOKEN_SECRET_HERE) {
+        throw "TwitterClient, please setup your environment";
+    }
+  }
+
+  _assumeExcludeQuery() {
+    var exclusionValidation = RegExp(/^[a-zA-Z\;]*$/);
+    if (TWITTER_EXCLUDED_ACCOUNTS && !exclusionValidation.test(TWITTER_EXCLUDED_ACCOUNTS)) {
+        throw "TwitterClient, invalid TWITTER_EXCLUDED_ACCOUNTS, expect semicolon separated twitter accounts (ex. \"elie;jeanDidier\")";
+    }
+    this.excludeQuery = TWITTER_EXCLUDED_ACCOUNTS ? TWITTER_EXCLUDED_ACCOUNTS.split(";").map((e)=>" -from:"+e).join() : "";
+  }
+
 }
 
 module.exports = TwitterClient;
