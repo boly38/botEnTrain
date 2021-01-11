@@ -57,6 +57,7 @@ Services
 - [Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs) hosting and automated review,deployments
 - [Cron-job.org](https://cron-job.org/) scheduler
 - [Travis-ci.org](https://www.travis-ci.org/) - CI - [![Build Status](https://www.travis-ci.org/boly38/botEnTrain.svg?branch=master)](https://www.travis-ci.org/boly38/botEnTrain)
+- [PlantNet.org](https://plantnet.org) - plant identification service
 
 Team: 
 - cf. [contributors](https://github.com/boly38/botEnTrain/graphs/contributors)
