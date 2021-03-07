@@ -23,9 +23,9 @@
     "url": "https://github.com/boly38/botEnTrain/issues"
   },
   "dependencies": {
-    "chai": "^4.2.0",
+    "chai": "^4.3.3",
     "dateformat": "^3.0.3",
-    "ejs": "^3.1.2",
+    "ejs": "^3.1.6",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "log4js": "^0.6.28",
