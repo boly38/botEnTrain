@@ -2,11 +2,11 @@
 Written in JavaScript for node.js this project is a Twitter bot.
 
 - Twitter account : [@botentrain1](https://twitter.com/botEnTrain1)
-- Bot webPage : [botentrain.herokuapp.com](https://botentrain.herokuapp.com/)
+- Bot webPage : [botentrain.onrender.com](https://botentrain.onrender.com/)
 
 ## Bot features (plugins)
 
-- French help - cf. [botentrain.herokuapp.com/aide](https://botentrain.herokuapp.com/aide)
+- French help - cf. [botentrain.onrender.com/aide](https://botentrain.onrender.com/aide)
 - English [releases notes](https://github.com/boly38/botEnTrain/releases)  - via [![Automated Release Notes by gren](https://img.shields.io/badge/%F0%9F%A4%96-release%20notes-00B2EE.svg)](https://github-tools.github.io/github-release-notes/)
 
 ## Quick start
@@ -54,7 +54,7 @@ Application and code structure:
 - Twitter API ([doc](https://developer.twitter.com/en/docs))
 
 Services
-- [Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs) hosting and automated review,deployments
+- [Render](https://render.com/) free app hosting and automated deployments
 - [Cron-job.org](https://cron-job.org/) scheduler
 - [Travis-ci.org](https://www.travis-ci.org/) - CI - [![Build Status](https://www.travis-ci.org/boly38/botEnTrain.svg?branch=master)](https://www.travis-ci.org/boly38/botEnTrain)
 - [PlantNet.org](https://plantnet.org) - plant identification service
