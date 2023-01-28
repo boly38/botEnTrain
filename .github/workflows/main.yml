@@ -40,4 +40,4 @@ jobs:
         npm outdated --depth=3 || echo "you must think about update your dependencies :)"
 
     - name: Run tests
-      run: npm run ci-test
+      run: npm run test
