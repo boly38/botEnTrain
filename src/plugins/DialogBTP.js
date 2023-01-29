@@ -1,10 +1,10 @@
-const log4js = require('log4js');
+import log4js from 'log4js';
 
-class DialogBTP {
+export default class DialogBTP {
   constructor(plantnetBTP) {
     this.isAvailable = false;
     this.logger = log4js.getLogger('DialogBTP');
-    this.logger.setLevel('INFO');
+    this.logger.level = "INFO";
     this.plantnetBTP = plantnetBTP;
     this.isAvailable = this.plantnetBTP.isReady();
     this.logger.info((this.isAvailable ? "available" : "not available"));
@@ -22,13 +22,11 @@ class DialogBTP {
     return this.isAvailable;
   }
 
-  process(config, cb) {
-     let pluginConfig = config;
+  process(config) {
+     const pluginConfig = config;
      pluginConfig.pluginName = this.getName();
      pluginConfig.pluginTags = this.getPluginTags();
      pluginConfig.searchExtra = "@botentrain1 -from:botentrain1";
-     this.plantnetBTP.process(pluginConfig, cb);
+     return this.plantnetBTP.process(pluginConfig);
   }
 }
-
-module.exports = DialogBTP;

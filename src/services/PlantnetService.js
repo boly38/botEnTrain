@@ -1,24 +1,24 @@
-const log4js = require('log4js');
-const fs = require('fs');
-const superagent = require('superagent');
-const queryString = require('querystring');
-const TinyURL = require('tinyurl');
+import log4js from 'log4js';
+import fs from 'fs';
+import superagent from 'superagent';
+import queryString from 'querystring';
+import TinyURL from 'tinyurl';
 
 const MYPLANTNET_API_URL = 'https://my-api.plantnet.org/v2/identify/all';
 
 // Pl@ntNet API : https://github.com/plantnet/my.plantnet/blob/master/README.md
-class MyPlantnetClient {
+export default class PlantnetService {
 
-  constructor() {
+  constructor(config) {
     this.isAvailable = false;
-    this.logger = log4js.getLogger('MyPlantnetClient');
-    this.logger.setLevel('INFO'); // DEBUG will show api params
+    this.logger = log4js.getLogger('PlantnetService');
+    this.logger.level = "INFO"; // DEBUG will show api params
 
     try {
-        if (!process.env.MYPLANTNET_API_PRIVATE_KEY) {
-            throw "MyPlantnet, please setup your environment";
+        this.apiKey = config.plantnet.apikey;
+        if (!this.apiKey) {
+            throw "PlantnetService, please setup your environment";
         }
-        this.apiKey = process.env.MYPLANTNET_API_PRIVATE_KEY;
         this.isAvailable = true;
         this.logger.info("available");
     } catch (exception) {
@@ -31,33 +31,34 @@ class MyPlantnetClient {
   }
 
   identify(imageUrl, doSimulate, cb) {
-      this.logger.info("identify following image : " + imageUrl + (doSimulate ? " SIMULATION " : ""));
-      if (doSimulate === 'true') {
-        let simulatedAnswer = fs.readFileSync('./core/data/plantNetFrenchResponse.json');
-        cb(false, JSON.parse(simulatedAnswer));
+    const service = this;
+    service.logger.info("identify following image : " + imageUrl + (doSimulate ? " SIMULATION " : ""));
+    if (doSimulate === 'true') {
+      let simulatedAnswer = fs.readFileSync('./src/data/plantNetFrenchResponse.json');
+      cb(false, JSON.parse(simulatedAnswer));
+      return;
+    }
+    // https://my.plantnet.org/account/doc // v2
+    superagent.get(MYPLANTNET_API_URL)
+    .query({
+           "images": [imageUrl, imageUrl],
+           "organs": ["flower","leaf"],
+           "include-related-images": true,
+           "lang": "fr",
+          "api-key": service.apiKey,
+       })
+    .end((err, res) => {
+      if (err) {
+        let errStatus = err.status;
+        let errError = err.message;
+        let errDetails = err.response.text;
+        let errResult = "Pla@ntnet identify error (" + errStatus + ") " + errError;
+        service.logger.error(errResult + " - details:" + errDetails);
+        cb({ message: errResult, status: errStatus });
         return;
       }
-      // https://my.plantnet.org/account/doc // v2
-      superagent.get(MYPLANTNET_API_URL)
-      .query({
-             "images": [imageUrl, imageUrl],
-             "organs": ["flower","leaf"],
-             "include-related-images": true,
-             "lang": "fr",
-            "api-key": this.apiKey,
-         })
-      .end((err, res) => {
-        if (err) {
-          let errStatus = err.status;
-          let errError = err.message;
-          let errDetails = err.response.text;
-          let errResult = "Pla@ntnet identify error (" + errStatus + ") " + errError;
-          this.logger.error(errResult + " - details:" + errDetails);
-          cb({ message: errResult, status: errStatus });
-          return;
-        }
-        cb(false, res.body);
-      });
+      cb(false, res.body);
+    });
   }
 
   resultInfoOf(aResult) {
@@ -129,6 +130,3 @@ class MyPlantnetClient {
     return (Array.isArray(arr) && arr.length > 0);
   }
 }
-
-
-module.exports = MyPlantnetClient;

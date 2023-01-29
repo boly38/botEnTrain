@@ -33,9 +33,11 @@ jobs:
           echo "show outdated (if any)"
           npm outdated --depth=3 || echo "you must think about update your dependencies :)"
 
-      - name: Npm audit
-        uses: oke-py/npm-audit-action@v2
+      - name: Audit backend
+        uses: oke-py/npm-audit-action@v2.4.4
         with:
           audit_level: moderate
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_assignees: boly38
+          issue_labels: cybersecurity,bot-created
           dedupe_issues: true

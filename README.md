@@ -21,20 +21,27 @@ $ git clone https://github.com/boly38/botEnTrain.git
 
 1. Install NodeJs (https://nodejs.org/en/download/)
 2. Install dependencies
-    > npm install
+```bash
+npm install
+```
 
-### Setup your own private environment
+### Set your own private environment
 
+- study each required environment variable in the [template](./env/.env.template)
 - copy the template in a private file
-> cp scripts/env.template.sh scripts/bot.dontpush.sh
-- edit `scripts/bot.dontpush.sh`
-- source it
-> . ./scripts/bot.dontpush.sh
+```bash 
+cp ./env/.env.template ./env/.env.development
 
 ### Start the bot
 
 Execute the application
-> npm start
+```bash
+npm startDev
+```
+or (production mode)
+```bash
+npm run start
+```
 
 ### Contribution
 Please submit a [pull request](https://github.com/boly38/botEnTrain/pulls)
@@ -42,7 +49,7 @@ Please submit a [pull request](https://github.com/boly38/botEnTrain/pulls)
 Activated bot:
 - [houndci](https://houndci.com/)
 
-### Support (bug, improvment)
+### Support (bug, improvement)
 
 Please use [issues](https://github.com/boly38/botEnTrain/issues)
 
@@ -54,9 +61,9 @@ Application and code structure:
 - Twitter API ([doc](https://developer.twitter.com/en/docs))
 
 Services
+- Github actions
 - [Render](https://render.com/) free app hosting and automated deployments
 - [Cron-job.org](https://cron-job.org/) scheduler
-- [Travis-ci.org](https://www.travis-ci.org/) - CI - [![Build Status](https://www.travis-ci.org/boly38/botEnTrain.svg?branch=master)](https://www.travis-ci.org/boly38/botEnTrain)
 - [PlantNet.org](https://plantnet.org) - plant identification service
 
 Team: 
