@@ -1,8 +1,8 @@
 // const dateFormat = require('dateformat');
 
-class NewsBot {
-  constructor(maxBufferEntries) {
-    this.max = maxBufferEntries && maxBufferEntries > 0 ? maxBufferEntries : 10;
+class NewsService {
+  constructor() {
+    this.max = 30;
     this.lastNews = [];
   }
 
@@ -26,4 +26,4 @@ class NewsBot {
   }
 }
 
-module.exports = NewsBot;
+export default NewsService;
