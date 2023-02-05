@@ -15,7 +15,7 @@ export default class PlantnetService {
     this.logger.level = "INFO"; // DEBUG will show api params
 
     try {
-        this.apiKey = config.plantnet.apikey;
+        this.apiKey = config.plantnet.apiKey;
         if (!this.apiKey) {
             throw "PlantnetService, please setup your environment";
         }
