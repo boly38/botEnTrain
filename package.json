@@ -13,7 +13,9 @@
     "lint": "eslint .",
     "jshint": "jshint .",
     "test": "echo windows test&& set NODE_ENV=test&& mocha --timeout 180000 --reporter spec",
-    "ci-test": "echo linux ci-test&& export NODE_ENV=test&& mocha --timeout 180000 --reporter spec"
+    "tst": "echo windows %TST% test&& set NODE_ENV=test&& mocha --trace-warnings --timeout 180000 --unhandled-rejections=strict test/all-root.test.js test/%TST%.test.js",
+    "wci-test": "echo ci-test&& set NODE_ENV=test&& c8 mocha --unhandled-rejections=strict test/*.test.js --timeout 50000",
+    "ci-test": "echo ci-test&& export NODE_ENV=test&&c8 mocha --unhandled-rejections=strict test/*.test.js --timeout 50000"
   },
   "repository": {
     "type": "git",
@@ -47,6 +49,7 @@
     "typescript": "^4.9.5"
   },
   "devDependencies": {
+    "c8": "^7.13.0",
     "mocha": "^10.2.0"
   },
   "resolutions": {

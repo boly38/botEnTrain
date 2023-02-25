@@ -6,7 +6,7 @@ import ApplicationProperties from './ApplicationProperties.js';
 import Common from '../services/Common.js';
 import NewsService from '../services/NewsService.js';
 
-import TwitterV2Service from '../services/TwitterV2Service.js';
+import TwitterAPIV2Service from '../services/TwitterAPIV2Service.js';
 import PlantnetService from '../services/PlantnetService.js';
 
 import FilmBTP from '../plugins/FilmBTP.js';
@@ -21,7 +21,7 @@ import log4js from 'log4js';
 class ApplicationConfig {
 
     constructor() {
-      this.logger = log4js.getLogger('TwitterV2Service');
+      this.logger = log4js.getLogger('ApplicationConfig');
       this.logger.level = "DEBUG"; // DEBUG will show api params
       const container = new ContainerBuilder();
 
@@ -32,7 +32,7 @@ class ApplicationConfig {
       container.register('common', Common);
       container.register('newsService', NewsService);
 
-      container.register('twitterV2Service', TwitterV2Service)
+      container.register('twitterAPIV2Service', TwitterAPIV2Service)
                .addArgument( container.get('config') )
                .addArgument( container.get('common') );
 
@@ -48,9 +48,10 @@ class ApplicationConfig {
       const container = this.container;
 
       container.register('filmBTP', FilmBTP)
-               .addArgument( container.get('twitterV2Service') );
+               .addArgument( container.get('twitterAPIV2Service') );
       container.register('plantnetBTP', PlantnetBTP)
-               .addArgument( container.get('twitterV2Service') )
+               .addArgument( container.get('config') )
+               .addArgument( container.get('twitterAPIV2Service') )
                .addArgument( container.get('plantnetService') );
       container.register('dialogBTP', DialogBTP)
                .addArgument( container.get('plantnetBTP') );

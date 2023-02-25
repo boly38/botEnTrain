@@ -1,5 +1,14 @@
+# IntelliJ
 *.iml
 .idea/
+
+# NodeJS
 node_modules/
+
+# Customs
 *.dontpush.*
 drafts/
+
+# coverage
+.nyc_output/
+coverage/

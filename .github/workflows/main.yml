@@ -23,7 +23,7 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
         node-version: [16.x]
 
-    environment: github_actions_bet
+    environment: github_actions_bet #NODE_ENV=test
     steps:
     - uses: actions/checkout@v3
 
@@ -44,3 +44,17 @@ jobs:
       run: |
         echo "${{ secrets.TEST_ENV_FILE }}" >> ./env/.env.test
         npm run ci-test
+
+    - name: Report coverage
+      continue-on-error: true
+      uses: romeovs/lcov-reporter-action@v0.2.16
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        lcov-file: ./coverage/lcov.info
+
+    - name: Npm audit
+      uses: oke-py/npm-audit-action@v1.7.1
+      with:
+        audit_level: moderate
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        dedupe_issues: true

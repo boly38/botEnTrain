@@ -33,7 +33,7 @@ export default class PlantnetService {
   identify(imageUrl, doSimulate, cb) {
     const service = this;
     service.logger.info("identify following image : " + imageUrl + (doSimulate ? " SIMULATION " : ""));
-    if (doSimulate === 'true') {
+    if (doSimulate) {
       let simulatedAnswer = fs.readFileSync('./src/data/plantNetFrenchResponse.json');
       cb(false, JSON.parse(simulatedAnswer));
       return;

@@ -61,7 +61,7 @@ Application and code structure:
 - Twitter API ([doc](https://developer.twitter.com/en/docs))
 
 Services
-- Github actions
+- GitHub actions
 - [Render](https://render.com/) free app hosting and automated deployments
 - [Cron-job.org](https://cron-job.org/) scheduler
 - [PlantNet.org](https://plantnet.org) - plant identification service

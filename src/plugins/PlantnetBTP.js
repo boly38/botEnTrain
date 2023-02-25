@@ -3,14 +3,14 @@ import fs from 'fs';
 
 const PLANTNET_MINIMAL_PERCENT = 20;
 const PLANTNET_MINIMAL_RATIO = PLANTNET_MINIMAL_PERCENT / 100;
-const PLANTNET_SIMULATE = process.env.PLANTNET_SIMULATE || false;
 
 export default class PlantnetBTP {
-  constructor(twitterService, plantnetService) {
+  constructor(config, twitterAPIV2Service, plantnetService) {
     this.isAvailable = false;
     this.logger = log4js.getLogger('PlantnetBTP');
-    this.logger.level = "DEBUG"; // DEBUG will show search results
-    this.twitterService = twitterService;
+    this.logger.level = "INFO"; // DEBUG will show search results
+    this.twitterV2Service = twitterAPIV2Service;
+    this.plantnetSimulate = (config.bot.plantnetSimulate === true);
     this.plantnetService = plantnetService;
     try {
         let questionsData = fs.readFileSync('src/data/questionsPlantnet.json');
@@ -19,7 +19,7 @@ export default class PlantnetBTP {
         this.logger.info((this.isAvailable ? "available" : "not available") +
           " with " + this.questions.length + " questions");
     } catch (exception) {
-        this.logger.error(exception);
+        this.logError("init", exception);
     }
   }
 
@@ -37,63 +37,70 @@ export default class PlantnetBTP {
 
   _debugTweet() {
       let tweetId = "11223344";
-      this.twitterService.getTweetDetails(tweetId, (err, data) => {
-          this.logger.error(err);
+      this.twitterV2Service.getTweetDetails(tweetId, (err, data) => {
+          this.logError("_debugTweet::getTweetDetails",err);
           this.logger.info(data);
       });
   }
 
   process(config) {
+    var { pluginName, pluginTags, doSimulate } = config;
+    if (config.pluginName === undefined || config.pluginTags === undefined) {
+      config.pluginName = plugin.getName();
+      config.pluginTags = plugin.getPluginTags();
+    }
+    config.doSimulate = (config.doSimulate === true);
+
     const plugin = this;
     return new Promise(async function(resolve, reject) {
-      const pluginName = config.pluginName ? config.pluginName : plugin.getName();
-      const pluginTags = config.pluginTags ? config.pluginTags : plugin.getPluginTags();
-      const doSimulate = config.doSimulate || false;
       // DEBUG // this._debugTweet(); return;
-      const allQuestions = "(\"" + plugin.questions.join("\" OR \"") + "\")" + " ?";
+      const allQuestions = "(\"" + plugin.questions.join("\" OR \"") + "\")" + " \"?\"";
       const noArbre = " -arbre";
-      const withImage = " filter:media filter:images";
+      const withImage = " (has:media) (has:images)";
       var plantnetSearch = allQuestions + noArbre + withImage;
       if (config.searchExtra) {
         plantnetSearch += " " + config.searchExtra;
       }
-      const tweets = await plugin.searchTweets(plantnetSearch)
+      const {tweets, medias, users} = await plugin.searchTweets(plantnetSearch)
                                  .catch( err => {
-                                   plugin.logger.error(err);
+                                   plugin.logError("searchTweets",{plantnetSearch, err});
                                    reject({ "message": "impossible de chercher des tweets", "status": 500});
                                  });
       if (tweets === undefined) {
         return;
       }
 
-      //this._debugLogTweets(tweets);
+      //this._debugLogTweets(tweets, users);
       const tweetCandidate = plugin.randomFromArray(tweets);
       if (!tweetCandidate) {
+          plugin.logger.info("no candidate");
           reject({ "message": "aucun candidat pour " + pluginName, "status": 202});
           return;
       }
-      const candidateImage = plugin.twitterService.tweetFirstMediaUrl(tweetCandidate);
+      const candidatePhoto = plugin.twitterV2Service.tweetFirstPhotoMedia(tweetCandidate, medias);
+      const candidateImage = candidatePhoto?.url;
       plugin.logger.debug("tweetCandidate : " +
-          plugin.twitterService.tweetLinkOf(tweetCandidate) + "\n\t" +
-          plugin.twitterService.tweetInfoOf(tweetCandidate) + "\n\t" +
+          plugin.twitterV2Service.tweetLinkOf(tweetCandidate, users) + "\n\t" +
+          plugin.twitterV2Service.tweetInfoOf(tweetCandidate, users) + "\n\t" +
           "first media url : " + candidateImage + "\n");
 
       if (!candidateImage) {
-          reject({ "message": "aucune image pour pl@ntnet dans" + plugin.twitterService.tweetLinkOf(tweetCandidate), "status": 202});
+          plugin.logger.info("no candidate image");
+          reject({ "message": "aucune image pour pl@ntnet dans" + plugin.twitterV2Service.tweetLinkOf(tweetCandidate, users), "status": 202});
           return;
       }
       plugin.logger.debug("candidateImage : " + candidateImage);
 
-      plugin.plantnetService.identify(candidateImage, PLANTNET_SIMULATE, (err, plantResult) => {
+      plugin.plantnetService.identify(candidateImage, plugin.plantnetSimulate, (err, plantResult) => {
           if (err) {
-              plugin.logger.error(err.message);
+              plugin.logError("plantnetService.identify", {candidateImage, "plantnetSimulate": plugin.plantnetSimulate, err});
               if (err.status && err.status == 404) {
-                  plugin.replyNotFoundResult(doSimulate, pluginTags, tweetCandidate, cb);
+                  plugin.replyNotFoundResult(doSimulate, pluginTags, tweetCandidate, users, cb);
                   return;
               }
               reject({"message": "impossible d'identifier l'image",
                   "html": "<b>Tweet</b>: <div class=\"bg-warning\">" +
-                  plugin.twitterService.tweetHtmlOf(tweetCandidate) + "</div>" +
+                  plugin.twitterV2Service.tweetHtmlOf(tweetCandidate, users) + "</div>" +
                   " <b>Erreur</b>: impossible d'identifier l'image",
                   "status": 500});
               return;
@@ -103,26 +110,26 @@ export default class PlantnetBTP {
 
           const firstScoredResult = plugin.plantnetService.hasScoredResult(plantResult, PLANTNET_MINIMAL_RATIO);
           if (!firstScoredResult) {
-              plugin.replyNoScoredResult(doSimulate, pluginTags, tweetCandidate).catch(reject).then(resolve);
+              plugin.replyNoScoredResult(doSimulate, pluginTags, tweetCandidate, users).catch(reject).then(resolve);
               return;
           }
-          plugin.replyScoredResult(doSimulate, pluginTags, tweetCandidate, firstScoredResult).catch(reject).then(resolve);
+          plugin.replyScoredResult(doSimulate, pluginTags, tweetCandidate, users, firstScoredResult).catch(reject).then(resolve);
 
       }); // plantnetService.identify end
 
     });
   }
 
-  _debugLogTweets(tweets) {
+  _debugLogTweets(tweets, users) {
       let debugLog = "";
       tweets.forEach((t) => {
-          debugLog += "\n\t" + this.twitterService.tweetLinkOf(t) + "\n\t\t" + this.twitterService.tweetInfoOf(t);
+          debugLog += "\n\t" + this.twitterV2Service.tweetLinkOf(t, users) + "\n\t\t" + this.twitterV2Service.tweetInfoOf(t, users);
           // debugLog += JSON.stringify(t) ;
       });
       this.logger.debug("tweets " + debugLog);
   }
 
-  replyScoredResult(doSimulate, pluginTags, tweetCandidate, firstScoredResult) {
+  replyScoredResult(doSimulate, pluginTags, tweetCandidate, users, firstScoredResult) {
     const plugin = this;
     return new Promise(async function(resolve, reject) {
       plugin.plantnetService.resultImageOf(firstScoredResult, (illustrateImage) => {
@@ -131,48 +138,49 @@ export default class PlantnetBTP {
         (illustrateImage ? "\n\n" + illustrateImage : "") + "\n\n" +
         pluginTags;
 
-        plugin.replyResult(doSimulate, tweetCandidate, replyMessage).catch(reject).then(resolve);
+        plugin.replyResult(doSimulate, tweetCandidate, users, replyMessage).catch(reject).then(resolve);
       });
     });
 
   }
 
-  replyNotFoundResult(doSimulate, pluginTags, tweetCandidate) {
+  replyNotFoundResult(doSimulate, pluginTags, tweetCandidate, users) {
       const replyMessage = "Bonjour, j'ai interrogé Pl@ntnet pour tenter d'identifier votre première image" +
       " mais a priori il ne s'agit ni d'une plante ni d'une fleur 😏 ?\n" +
       "Je me suis bien fait avoir 😊 !\n\n" +
       pluginTags;
-      return this.replyResult(doSimulate, tweetCandidate, replyMessage);
+      return this.replyResult(doSimulate, tweetCandidate, users, replyMessage);
    }
 
-  replyNoScoredResult(doSimulate, pluginTags, tweetCandidate) {
+  replyNoScoredResult(doSimulate, pluginTags, tweetCandidate, users) {
       const replyMessage = "Bonjour, j'ai interrogé Pl@ntnet pour tenter d'identifier votre première image" +
       " mais cela n'a pas donné de résultat concluant 😩 (score>" + PLANTNET_MINIMAL_PERCENT + "%).\n" +
       "Astuce: bien cadrer la fleur ou feuille\n\n" +
       pluginTags;
-      return this.replyResult(doSimulate, tweetCandidate, replyMessage);
+      return this.replyResult(doSimulate, tweetCandidate, users, replyMessage);
   }
 
-  replyResult(doSimulate, tweetCandidate, replyMessage) {
+  replyResult(doSimulate, tweetCandidate,  users, replyMessage) {
     const plugin = this;
+    plugin.logger.info("reply result", JSON.stringify({doSimulate, tweetCandidate, replyMessage},null,2));
     return new Promise(async function(resolve, reject) {
-      const replyTweet = await plugin.replyTweet(doSimulate, tweetCandidate, replyMessage)
+      const replyTweet = await plugin.replyTweet(doSimulate, tweetCandidate,  users, replyMessage)
                                      .catch( err => {
-                                         plugin.logger.error(err);
+                                         plugin.logError("replyTweet", {err, doSimulate, tweetCandidate,  users, replyMessage});
                                          reject({"message": "impossible de répondre au tweet", "status": 500});
                                      });
       if (replyTweet !== undefined) {
           resolve({
               "html": "<b>Tweet</b>: <div class=\"bg-info\">" +
-                  plugin.twitterService.tweetHtmlOf(tweetCandidate) + "</div>" +
+                  plugin.twitterV2Service.tweetHtmlOf(tweetCandidate, users) + "</div>" +
                   "<b>Réponse émise</b>: " +
-                  plugin.twitterService.tweetHtmlOf(replyTweet),
+                  plugin.twitterV2Service.tweetReplyHtmlOf(replyTweet),
               "text": "\nTweet:\n\t" +
-                  plugin.twitterService.tweetLinkOf(tweetCandidate) + "\n\t" +
-                  plugin.twitterService.tweetInfoOf(tweetCandidate) + "\n" +
+                  plugin.twitterV2Service.tweetLinkOf(tweetCandidate, users) + "\n\t" +
+                  plugin.twitterV2Service.tweetInfoOf(tweetCandidate, users) + "\n" +
                   "Reply sent:\n\t" +
-                  plugin.twitterService.tweetLinkOf(replyTweet) + "\n\t" +
-                  plugin.twitterService.tweetInfoOf(replyTweet) + "\n"
+                  plugin.twitterV2Service.tweetReplyLinkOf(replyTweet) + "\n\t" +
+                  plugin.twitterV2Service.tweetReplyInfoOf(replyTweet) + "\n"
           });
       }
     });
@@ -181,39 +189,46 @@ export default class PlantnetBTP {
   searchTweets(plantnetSearch) {
     const plugin = this;
     return new Promise(async function(resolve, reject) {
-      const noRetweet = " -filter:retweets";
-      const notMe = " -from:botEnTrain1";
-      const extendedMode = true;
+      const botEnTrainId = '1254020717710053376';
+      const noRetweet = " (-is:retweet)";
+      const notMe = " (-from:botEnTrain1)";
       plugin.logger.debug("get recent answers");
-      const recentAnswersIds = await plugin.twitterService.getRecentlyAnsweredStatuses("botEnTrain1", 200)
+      const recentAnswersIds = await plugin.twitterV2Service.getRecentlyAnsweredStatuses(botEnTrainId, 100)// valid range : 5..100
                                            .catch(err => {
-                                              plugin.logger.warn("Unable to search recent answers " + JSON.stringify(err));
-                                              reject(err);
+                                              plugin.logError("twitterV2Service.getRecentlyAnsweredStatuses", {botEnTrainId, err});
+                                              reject("Unable to search tweets");
                                            });
+      if (recentAnswersIds === undefined) {
+        return;
+      }
       const searchQueryNotMe = plantnetSearch + noRetweet + notMe;
-      const tweets = await plugin.twitterService.searchV1(searchQueryNotMe, 50, extendedMode)
-                                 .catch( err => {
-                                   reject(err);
-                                 });
+      var {tweets, users, medias, rateLimit} = await plugin.twitterV2Service.searchRecent(searchQueryNotMe, 50)
+                                                   .catch( err => {
+                                                     plugin.logError("twitterV2Service.searchRecent", {searchQueryNotMe, err});
+                                                     reject("Unable to search tweets");
+                                                   });
+      if (tweets === undefined) {
+        return;
+      }
       var filteredTweets = tweets;
       if (plugin.arrayWithContent(tweets) && plugin.arrayWithContent(recentAnswersIds)) {
         filteredTweets = plugin.filterRecentAnswers(tweets, recentAnswersIds);
         plugin.logger.debug("Exclude " + (tweets.length - filteredTweets.length));
       }
-      resolve(filteredTweets);
+      resolve({"tweets":filteredTweets, users, medias});
     });
   }
 
-  replyTweet(doSimulate, tweet, replyMessage) {
-    return this.twitterService.replyTo(tweet, replyMessage, doSimulate);
+  replyTweet(doSimulate, tweet,  users, replyMessage) {
+    return this.twitterV2Service.replyTo(tweet, users, replyMessage, doSimulate);
   }
 
   filterRecentAnswers(tweets, recentAnswersIds) {
     if (!tweets) {
       return [];
     }
-    return tweets.filter((t) => {
-        return !recentAnswersIds.includes(t.id_str);
+    return tweets.filter(t => {
+        return !recentAnswersIds.includes(t.id);
     });
   }
 
@@ -226,5 +241,13 @@ export default class PlantnetBTP {
 
   arrayWithContent(arr) {
     return (Array.isArray(arr) && arr.length > 0);
+  }
+
+  logError(action, err) {
+    if (Object.keys(err) && Object.keys(err).length > 0) {
+      this.logger.error(action, JSON.stringify(err, null, 2));
+      return;
+    }
+    this.logger.error(action, err);
   }
 }

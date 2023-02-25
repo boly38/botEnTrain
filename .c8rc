@@ -1,0 +1,12 @@
+{
+ "official_doc":"https://github.com/bcoe/c8",
+ "check-coverage": true,
+   "lines":60,
+   "functions": 50,
+   "branches":60,
+   "statements": 60,
+ "reporter": ["text","html","lcov"],
+ "src": ["./src"],
+ "include": ["**/*.js"],
+ "exclude": ["test/"]
+}
