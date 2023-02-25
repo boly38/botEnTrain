@@ -26,7 +26,7 @@ export default class DialogBTP {
      const pluginConfig = config;
      pluginConfig.pluginName = this.getName();
      pluginConfig.pluginTags = this.getPluginTags();
-     pluginConfig.searchExtra = "@botentrain1 -from:botentrain1";
+     pluginConfig.searchExtra = "\"@botentrain1\" (-from:botentrain1)";
      return this.plantnetBTP.process(pluginConfig);
   }
 }

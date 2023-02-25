@@ -4,8 +4,9 @@ import { ContainerBuilder } from 'node-dependency-injection';
 import ApplicationConfig from '../src/config/ApplicationConfig.js';
 const appConfig = ApplicationConfig.getInstance();
 
+const nodeEnv = process.env.NODE_ENV;
 before(async function () {
-  console.info("ROOT :: before");
+  console.info(`ROOT :: before - env:${nodeEnv}`);
 
 });
 

@@ -5,11 +5,11 @@ const BEHAVIOR_TEST_INDEX = process.env.BEHAVIOR_TEST_INDEX || false;
 
 export default class FilmBTP {
 
-  constructor(twitterService) {
+  constructor(twitterV2Service) {
     this.isAvailable = false;
     this.logger = log4js.getLogger('FilmBTP');
     this.logger.level = "DEBUG"; // DEBUG will show search results
-    this.twitterService = twitterService;
+    this.twitterV2Service = twitterV2Service;
     try {
         const behaviorsData = fs.readFileSync('src/data/filmBtp.json');
         this.behaviors = JSON.parse(behaviorsData);
@@ -38,7 +38,7 @@ export default class FilmBTP {
       const doSimulate = config.doSimulate || false;
       const behavior = BEHAVIOR_TEST_INDEX && plugin.behaviors.length > BEHAVIOR_TEST_INDEX ?
                                  plugin.behaviors[BEHAVIOR_TEST_INDEX] : plugin.randomFromArray(plugin.behaviors);
-      const tweets = await plugin.searchTweets(behavior)
+      const {tweets, users} = await plugin.searchTweets(behavior)
                                  .catch(err => {
                                    plugin.logger.error(err);
                                    reject({ "message": "impossible de chercher des tweets", "status": 500});
@@ -65,7 +65,7 @@ export default class FilmBTP {
           reject({ "message": "aucun candidat pour '" + behavior.search + "'", "status": 202});
           return;
       }
-      const replyTweet = await plugin.replyTweet(doSimulate, tweetCandidate, behavior)
+      const replyTweet = await plugin.replyTweet(doSimulate, tweetCandidate, users, behavior)
                                      .catch(err => {
                                        plugin.logger.error(err);
                                        reject({"message": "impossible de répondre au tweet", "status": 500});
@@ -73,15 +73,15 @@ export default class FilmBTP {
       if (replyTweet) {
           resolve({
               "html": "<b>Tweet</b>: <div class=\"bg-info\">" +
-                  plugin.twitterService.tweetHtmlOf(tweetCandidate) + "</div>" +
+                  plugin.twitterV2Service.tweetHtmlOf(tweetCandidate, users) + "</div>" +
                   "<b>Réponse émise</b>: " +
-                  plugin.twitterService.tweetHtmlOf(replyTweet),
+                  plugin.twitterV2Service.tweetReplyHtmlOf(replyTweet),
               "text": "\nTweet:\n\t" +
-                  plugin.twitterService.tweetLinkOf(tweetCandidate) + "\n\t" +
-                  plugin.twitterService.tweetInfoOf(tweetCandidate) + "\n" +
+                  plugin.twitterV2Service.tweetLinkOf(tweetCandidate, users) + "\n\t" +
+                  plugin.twitterV2Service.tweetInfoOf(tweetCandidate, users) + "\n" +
                   "Reply sent:\n\t" +
-                  plugin.twitterService.tweetLinkOf(replyTweet) + "\n\t" +
-                  plugin.twitterService.tweetInfoOf(replyTweet) + "\n"
+                  plugin.twitterV2Service.tweetReplyLinkOf(replyTweet) + "\n\t" +
+                  plugin.twitterV2Service.tweetReplyInfoOf(replyTweet) + "\n"
           });
       }
     });
@@ -90,17 +90,16 @@ export default class FilmBTP {
   searchTweets(behavior) {
     const plugin = this;
     return new Promise(async function promise(resolve, reject) {
-      const noRetweet = " -filter:retweets";
-      const fromMe = " from:botEnTrain1";
-      const notMe = " -from:botEnTrain1";
-      const extendedMode = true;
+      const noRetweet = " (-is:retweet)";
+      const fromMe = " (from:botEnTrain1)";
+      const notMe = " (-from:botEnTrain1)";
       const searchQueryFromMe = "\"" + behavior.reply + "\"" + noRetweet + fromMe;
-      const tweets = await plugin.twitterService.searchV1(searchQueryFromMe, 200, !extendedMode)
-                                                .catch(reject);
+      var {tweets, users, rateLimit} = await plugin.twitterV2Service.searchRecent(searchQueryFromMe, 100)
+                                                     .catch(reject);
       if (tweets === undefined) {
         return;
       }
-      const mentioned = plugin.twitterService.tweetsUserMentionsNames(tweets);
+      const mentioned = plugin.twitterV2Service.tweetsUserMentionsNames(tweets);
       if (plugin.arrayWithContent(mentioned)) {
         plugin.logger.debug("Exclude already mentioned users => " + mentioned.join(', '));
       }
@@ -108,22 +107,22 @@ export default class FilmBTP {
       mentioned.forEach(mentionedUser => {// exclude alreadyMentioned
           searchQueryNotMe += " -from:" + mentionedUser;
       });
-      const tweetsWithExclusions = await plugin.twitterService.searchV1(searchQueryNotMe, 20, !extendedMode)
-                                                              .catch(reject);
-      if (tweetsWithExclusions === undefined) {
+      var {tweets, users, rateLimit} = await plugin.twitterV2Service.searchRecent(searchQueryNotMe, 20)
+                                                                      .catch(reject);
+      if (tweets === undefined) {
         return;
       }
-      resolve(tweetsWithExclusions);
+      resolve({tweets, users});
     });
   }
 
-  replyTweet(doSimulate, tweet, behavior) {
+  replyTweet(doSimulate, tweet, users, behavior) {
     let replyMessage = behavior.reply + "\n\n";
     if (behavior.credits) {
       replyMessage += behavior.credits + "\n";
     }
     replyMessage += behavior.link + "\n" + this.getPluginTags();
-    return this.twitterService.replyTo(tweet, replyMessage, doSimulate);
+    return this.twitterV2Service.replyTo(tweet, users, replyMessage, doSimulate);
   }
 
   randomFromArray(arr) {
