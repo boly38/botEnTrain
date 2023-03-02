@@ -44,6 +44,7 @@ export default class PlantnetBTP {
   }
 
   process(config) {
+    const plugin = this;
     var { pluginName, pluginTags, doSimulate } = config;
     if (config.pluginName === undefined || config.pluginTags === undefined) {
       config.pluginName = plugin.getName();
@@ -51,7 +52,6 @@ export default class PlantnetBTP {
     }
     config.doSimulate = (config.doSimulate === true);
 
-    const plugin = this;
     return new Promise(async function(resolve, reject) {
       // DEBUG // this._debugTweet(); return;
       const allQuestions = "(\"" + plugin.questions.join("\" OR \"") + "\")" + " \"?\"";

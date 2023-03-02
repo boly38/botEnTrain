@@ -75,9 +75,6 @@ class ApplicationConfig {
     get(beanName) {
       return this.container.get(beanName);
     }
-
-    close() {
-    }
 }
 
 ApplicationConfig.singleton = null;
@@ -103,12 +100,11 @@ ApplicationConfig.startApp = async () => {
       ;
 
     const expressServer = appConfig.container.get('expressServer');
-    expressServer.init()
+    ApplicationConfig.listeningServer = await expressServer.init()
                  .catch(errInitServer => {
       this.logger.error("Error, unable to init express server:" + errInitServer);
       throw "Init failed";
     });
-
   } catch (error) {
     // console.trace();// print stack
     if (ApplicationConfig.singleton !== null) {
@@ -118,5 +114,11 @@ ApplicationConfig.startApp = async () => {
   }
 
 };
+
+ApplicationConfig.stopApp = async () => {
+  if (ApplicationConfig.listeningServer) {
+    ApplicationConfig.listeningServer.close();
+  }
+}
 
 export default ApplicationConfig;
