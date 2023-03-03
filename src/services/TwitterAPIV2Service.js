@@ -8,13 +8,16 @@ const TWEET_MAX_LENGTH = 280;
 const TWEET_QUERY_MAX_LENGTH = 512;
 const TWITTER_EXCLUDED_ACCOUNTS = process.env.TWITTER_EXCLUDED_ACCOUNTS || false;
 
+/**
+ * Use of Twitter V2 API
+ * Except for replyTo // uses v1 version of api
+ **/
 export default class TwitterAPIV2Service {
 
   constructor(config, common) {
     this._common = common;
     this.logger = log4js.getLogger('TwitterAPIV2Service');
     this.logger.level = "INFO"; // DEBUG will show api params
-    //this.excludeQuery = _getExcludeQuery();
     this.twitter1Config = config.twitter1;
     this.twitter2Config = config.twitter2;
 
@@ -120,6 +123,8 @@ export default class TwitterAPIV2Service {
   }
 
   // searchAll : cant access : https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference // Only available to those with Academic Research access
+
+  // uses v1 version of api
   replyTo(tweet, users, replyMsg, doSimulate) {
       const service = this;
       service.logger.debug("replyTo", JSON.stringify({tweet, replyMsg, doSimulate}, null, 2));
@@ -148,7 +153,7 @@ export default class TwitterAPIV2Service {
       }
       return new Promise(function(resolve, reject) {
         // reply uses OAuth 1.0a
-        service.twitterClient1.v2.reply(params.status, params.in_reply_to_status_id)
+        service.twitterClient1.v1.reply(params.status, params.in_reply_to_status_id)
                              .then( result => {
                                service.logger.debug("v2.reply result "+ JSON.stringify(params) + " - result: " + JSON.stringify(result));
                                resolve(result.data);
@@ -299,10 +304,12 @@ export default class TwitterAPIV2Service {
   }
 
   handleTweetError(action, err, logger, reject) {
-    logger.debug(action, err);
     const errors = TwitterApi.getErrors(err); // ErrorV1[]
-    logger.debug(action, errors === [] ? JSON.stringify(err, null, 2) : JSON.stringify(errors, null, 2));
-    reject(errors);
+    const rejectResult = (errors !== undefined && JSON.stringify(errors) !== "[]") ? errors :
+                         isJsonString(err) ? JSON.stringify(err, null, 2) :
+                         err;
+    logger.debug(action, rejectResult);
+    reject(rejectResult);
   }
 
 }
@@ -316,3 +323,12 @@ function _getExcludeQuery(exclusions = null) {
   return exclusions !== null ? exclusions.split(";").map( e =>` (-from:${e})`).join() : "";
 }
 
+
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
