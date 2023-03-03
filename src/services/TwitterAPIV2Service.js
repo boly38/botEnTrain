@@ -10,7 +10,6 @@ const TWITTER_EXCLUDED_ACCOUNTS = process.env.TWITTER_EXCLUDED_ACCOUNTS || false
 
 /**
  * Use of Twitter V2 API
- * Except for replyTo // uses v1 version of api
  **/
 export default class TwitterAPIV2Service {
 
@@ -124,7 +123,6 @@ export default class TwitterAPIV2Service {
 
   // searchAll : cant access : https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference // Only available to those with Academic Research access
 
-  // uses v1 version of api
   replyTo(tweet, users, replyMsg, doSimulate) {
       const service = this;
       service.logger.debug("replyTo", JSON.stringify({tweet, replyMsg, doSimulate}, null, 2));
@@ -153,7 +151,7 @@ export default class TwitterAPIV2Service {
       }
       return new Promise(function(resolve, reject) {
         // reply uses OAuth 1.0a
-        service.twitterClient1.v1.reply(params.status, params.in_reply_to_status_id)
+        service.twitterClient1.v2.reply(params.status, params.in_reply_to_status_id)
                              .then( result => {
                                service.logger.debug("v2.reply result "+ JSON.stringify(params) + " - result: " + JSON.stringify(result));
                                resolve(result.data);
