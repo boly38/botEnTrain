@@ -47,10 +47,10 @@ export default class PlantnetBTP {
     const plugin = this;
     var { pluginName, pluginTags, doSimulate } = config;
     if (config.pluginName === undefined || config.pluginTags === undefined) {
-      config.pluginName = plugin.getName();
-      config.pluginTags = plugin.getPluginTags();
+      pluginName = plugin.getName();
+      pluginTags = plugin.getPluginTags();
     }
-    config.doSimulate = (config.doSimulate === true);
+    doSimulate = (config.doSimulate === true);
 
     return new Promise(async function(resolve, reject) {
       // DEBUG // this._debugTweet(); return;
@@ -73,7 +73,7 @@ export default class PlantnetBTP {
       //this._debugLogTweets(tweets, users);
       const tweetCandidate = plugin.randomFromArray(tweets);
       if (!tweetCandidate) {
-          plugin.logger.info("no candidate");
+          plugin.logger.info("no candidate for " + pluginName );
           reject({ "message": "aucun candidat pour " + pluginName, "status": 202});
           return;
       }
