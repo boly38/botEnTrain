@@ -95,7 +95,7 @@ export default class PlantnetBTP {
           if (err) {
               plugin.logError("plantnetService.identify", {candidateImage, "plantnetSimulate": plugin.plantnetSimulate, err});
               if (err.status && err.status == 404) {
-                  plugin.replyNotFoundResult(doSimulate, pluginTags, tweetCandidate, users, cb);
+                  plugin.replyNotFoundResult(doSimulate, pluginTags, tweetCandidate, users).catch(reject).then(resolve);
                   return;
               }
               reject({"message": "impossible d'identifier l'image",
