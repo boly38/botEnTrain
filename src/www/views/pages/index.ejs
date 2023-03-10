@@ -1,8 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <%- include ('../partials/gganalytics') %>
   <%- include ('../partials/header') %>
+	<script type="text/javascript">
+	  function refreshSendDisabled() {
+        if ($('#tweet').val().length == 0)
+          $('#sendTweet').attr('disabled', 'disabled');
+        else
+          $('#sendTweet').attr('disabled', false);
+	  }
+
+      $(document).ready(function () {
+         $('#tweet').on('keyup', function() {
+            refreshSendDisabled();
+         });
+
+         $( "#sendTweet" ).click(function() {
+	         var tweet = $("#tweet").val();
+	         console.log(`send tweet ${tweet}`)
+             $.ajax('/api/v0/tweet', {
+                 type: 'POST', data: JSON.stringify({ tweet }),
+                 contentType: "application/json; charset=utf-8",
+                 dataType: "json",
+                 success: function (data, status, xhr) {
+                     $('#sendResult').text('status: ' + status + ', data: ' + JSON.stringify(data));
+                 },
+                 error: function (xhr, textStatus, errorMessage) {
+                   if (xhr?.responseJSON?.details)
+                     $('#sendResult').text('Erreur :' + xhr?.responseJSON?.details);
+                   else
+                     $('#sendResult').text('Erreur :' + JSON.stringify(errorMessage));
+                 }
+             });
+         });
+
+         refreshSendDisabled();
+      });
+    </script>
 </head>
 
 <body>
@@ -10,9 +44,32 @@
   <div class="panel-heading">
     <a href="https://twitter.com/botEnTrain1">@botEnTrain1</a>
     <%- include ('../partials/details') %>
-    <button type="button" class="btn btn-info">logs</button>
+    <button type="button" class="btn btn-info">accueil</button>
     <a href="/aide"><button type="button" class="btn btn-primary">aide</button></a>
   </div>
+
+<!-- canceled
+  <div class="panel panel-info">
+    <div class="panel-heading">Suggérer un tweet au robot</div>
+    <div class="panel-body">
+        <p>
+          <ul>
+              <li>Ajoutez le lien d'un tweet comportant une citation connue ou une question de plante pour que botEnTrain lui réponde</li>
+              <li>Consultez les logs ici même pour voir ce qu'a fait le robot</li>
+              <li>Les abus seront sanctionnés ^^</li>
+          </ul>
+        </p>
+        <form>
+          <input id="tweet"
+             class="panel-input" type="text"
+             placeholder="https://twitter.com/boly38/status/1630645960358412288"
+             value="https://twitter.com/boly38/status/1630645960358412288"/>
+          <input type="button" id="sendTweet" value="Proposer" disabled="disabled" >
+        </form>
+        <p id="sendResult"></p>
+    </div>
+  </div>
+  -->
 
   <div class="panel panel-info">
     <div class="panel-heading">Les logs du robot</div>

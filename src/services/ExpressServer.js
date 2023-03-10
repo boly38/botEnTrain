@@ -4,6 +4,7 @@ import express from 'express';
 import path from 'path';
 
 const __dirname = path.resolve();
+const wwwPath = path.join(__dirname, './src/www');
 
 // const BotEngine = require('./BotEngine.js');
 
@@ -33,20 +34,21 @@ class ExpressServer {
             expressServer.newsService.add("Réveil du robot en version " + expressServer.version);
 
             expressServer.botService.run();
-            expressServer.listeningServer = express()
-              .use(express.static(path.join(__dirname, './public')))
-              .set('views', path.join(__dirname, './views'))
-              .set('view engine', 'ejs')
-              .get('/aide',
-                (req, res) => res.render('pages/aide'))
-              .get('/hook',
-                (req, res) => expressServer.hookResponse(req, res))
-              .get('/*',
-                (req, res) => res.render('pages/index', {
+            expressServer.app = express();
+
+            expressServer.app.use(express.static(path.join(wwwPath, './public')));;
+            expressServer.app.set('views', path.join(wwwPath, './views'));
+            expressServer.app.set('view engine', 'ejs');
+            expressServer.app.get('/aide', (req, res) => res.render('pages/aide'));
+            expressServer.app.get('/hook', (req, res) => expressServer.hookResponse(req, res));
+
+            expressServer.app.get('/*',    (req, res) => res.render('pages/index', {
                     "news": expressServer.newsService.getNews(),
                     "status": expressServer.getState(),
                 }))
-              .listen(expressServer.port, () => expressServer.logger.info(`Listening on ${ expressServer.port }`));
+            expressServer.listeningServer = expressServer.app.listen(expressServer.port,
+                () => expressServer.logger.info(`Listening on ${ expressServer.port }`)
+            );
 
             resolve(expressServer.listeningServer);
           } catch (exception) {

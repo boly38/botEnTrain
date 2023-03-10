@@ -1,0 +1,13 @@
+.panel-input {
+  border: 1px solid green;
+  width: 400px;
+  margin-left: 30px;
+}
+
+#sendResult {
+  margin-left: 30px;
+}
+
+#sendTweet {
+  cursor: pointer;
+}
