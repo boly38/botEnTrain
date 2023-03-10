@@ -12,6 +12,7 @@ import PlantnetService from '../services/PlantnetService.js';
 import FilmBTP from '../plugins/FilmBTP.js';
 import PlantnetBTP from '../plugins/PlantnetBTP.js';
 import DialogBTP from '../plugins/DialogBTP.js';
+import YesMasterBTP from '../plugins/YesMasterBTP.js';
 
 import BotService from '../services/BotService.js';
 import ExpressServer from '../services/ExpressServer.js';
@@ -48,17 +49,26 @@ class ApplicationConfig {
       const container = this.container;
 
       container.register('filmBTP', FilmBTP)
+               .addArgument( container.get('common') )
                .addArgument( container.get('twitterAPIV2Service') );
       container.register('plantnetBTP', PlantnetBTP)
                .addArgument( container.get('config') )
+               .addArgument( container.get('common') )
                .addArgument( container.get('twitterAPIV2Service') )
                .addArgument( container.get('plantnetService') );
       container.register('dialogBTP', DialogBTP)
                .addArgument( container.get('plantnetBTP') );
 
+      container.register('yesMasterBTP', YesMasterBTP)
+               .addArgument( container.get('common') )
+               .addArgument( container.get('twitterAPIV2Service') )
+               .addArgument( container.get('plantnetBTP') )
+               .addArgument( container.get('filmBTP') );
+
       this.plugins.push( container.get('filmBTP') );
       this.plugins.push( container.get('plantnetBTP') );
       this.plugins.push( container.get('dialogBTP') );
+      this.plugins.push( container.get('yesMasterBTP') );
     }
 
     constructBot() {

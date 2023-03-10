@@ -3,7 +3,7 @@ import fs from 'fs';
 
 const __dirname = path.resolve();
 
-class Common {
+export default class Common {
 
   constructor() {
   }
@@ -41,8 +41,30 @@ class Common {
     console.error(msg);
   }
 
+  clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  randomFromArray(arr) {
+    if (!Array.isArray(arr) || arr.length <= 0) {
+        return undefined;
+    }
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  arrayWithContent(arr) {
+    return (Array.isArray(arr) && arr.length > 0);
+  }
+
+  filterTweetsExcludingIds(tweets, ids) {
+    if (!tweets) {
+      return [];
+    }
+    return tweets.filter(t => {
+        return !ids.includes(t.id);
+    });
+  }
+
 }
 
 Common.version = null;
-
-export default Common;

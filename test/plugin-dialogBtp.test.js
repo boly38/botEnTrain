@@ -42,7 +42,7 @@ describe("dialogBTP", function() {
       logger.debug("plugin.process",result);
       expect(result.html).not.to.be.empty;
       expect(result.text).not.to.be.empty;
-      expect(result.text).to.contains(" --- @botEnTrain1: SIMULATION - @");
+      expect(result.text).to.contains(" --- @botEnTrain1: SIMULATION -");
     }
 
   }).timeout(60 * 1000);

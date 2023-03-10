@@ -8,27 +8,28 @@ import { ContainerBuilder } from 'node-dependency-injection';
 import ApplicationConfig from '../src/config/ApplicationConfig.js';
 const appConfig = ApplicationConfig.getInstance();
 
-const logger = log4js.getLogger('plantnetBTP.test');
-logger.level = "INFO"; // DEBUG will show api params
+const logger = log4js.getLogger('yesMasterBTP.test');
+logger.level = "DEBUG"; // DEBUG will show api params
 
-// unused // import { TwitterV2IncludesHelper } from 'twitter-api-v2'; // https://github.com/PLhery/node-twitter-api-v2/blob/master/doc/helpers.md
 
 const boly38id = '11168212';
 const botentrain1id = '1254020717710053376';
+const notAnsweredTweet = "https://twitter.com/VillaNg2/status/1525582137382019072";
+const alreadyAnsweredTweet = "https://twitter.com/TelaBotanica/status/1317431664784662528";
 
 const pluginConfig = {doSimulate: true};
 var plugin;
 
-// v2 tests example : https://github.com/PLhery/node-twitter-api-v2/blob/master/test/tweet.v2.test.ts
-
-describe("plantnetBTP", function() {
+describe("yesMasterBTP", function() {
 
   before(async () => {
-    logger.debug("plantnetBTP test :: before");
-    plugin = appConfig.get('plantnetBTP');
+    logger.debug("yesMasterBTP test :: before");
+    plugin = appConfig.get('yesMasterBTP');
   });
 
-  it("simulate plantnet btp", async () => {
+  it("simulate yesMaster btp", async () => {
+
+    pluginConfig.tweet = alreadyAnsweredTweet;
 
     const result = await plugin.process(pluginConfig).catch( err => {
       if (err.status === 202) {
@@ -54,5 +55,12 @@ const _expectNoError = (err) => {
   console.trace();// print stack
   // var stack = new Error().stack
   // console.log( stack )
-  expect.fail(err);
+  expect.fail(mixedErrorToString(err));
+}
+
+const mixedErrorToString = (error) => {
+  if (error === undefined || error === null) {
+    return error;
+  }
+  return Object.keys(error).length > 0 ? JSON.stringify(error) : error;
 }

@@ -30,35 +30,41 @@ export default class PlantnetService {
     return this.isAvailable;
   }
 
-  identify(imageUrl, doSimulate, cb) {
+  identify(options) {
     const service = this;
+    var { imageUrl, doSimulate } = options;
+    doSimulate = !(doSimulate === false) || imageUrl === undefined;
     service.logger.info("identify following image : " + imageUrl + (doSimulate ? " SIMULATION " : ""));
-    if (doSimulate) {
-      let simulatedAnswer = fs.readFileSync('./src/data/plantNetFrenchResponse.json');
-      cb(false, JSON.parse(simulatedAnswer));
-      return;
-    }
-    // https://my.plantnet.org/account/doc // v2
-    superagent.get(MYPLANTNET_API_URL)
-    .query({
-           "images": [imageUrl, imageUrl],
-           "organs": ["flower","leaf"],
-           "include-related-images": true,
-           "lang": "fr",
-          "api-key": service.apiKey,
-       })
-    .end((err, res) => {
-      if (err) {
-        let errStatus = err.status;
-        let errError = err.message;
-        let errDetails = err.response.text;
-        let errResult = "Pla@ntnet identify error (" + errStatus + ") " + errError;
-        service.logger.error(errResult + " - details:" + errDetails);
-        cb({ message: errResult, status: errStatus });
+
+    return new Promise(async (resolve, reject) => {
+      if (doSimulate) {
+        const simulatedAnswer = JSON.parse(fs.readFileSync('./src/data/plantNetFrenchResponse.json', 'utf8'));
+        resolve(simulatedAnswer);
         return;
       }
-      cb(false, res.body);
-    });
+
+      // https://my.plantnet.org/account/doc // v2
+      superagent.get(MYPLANTNET_API_URL)
+      .query({
+             "images": [imageUrl, imageUrl],
+             "organs": ["flower","leaf"],
+             "include-related-images": true,
+             "lang": "fr",
+            "api-key": service.apiKey,
+         })
+      .end((err, res) => {
+        if (err) {
+          let errStatus = err.status;
+          let errError = err.message;
+          let errDetails = err.response.text;
+          let errResult = "Pla@ntnet identify error (" + errStatus + ") " + errError;
+          service.logger.error(errResult + " - details:" + errDetails);
+          reject({ message: errResult, status: errStatus });
+          return;
+        }
+        resolve(res.body);
+      });
+    })
   }
 
   resultInfoOf(aResult) {
