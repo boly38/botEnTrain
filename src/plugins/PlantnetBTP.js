@@ -32,6 +32,10 @@ export default class PlantnetBTP {
     return ["#BetPlantnet","#IndentificationDePlantes"].join(' ');
   }
 
+  getQuestions() {
+    return this.common.clone(this.questions);
+  }
+
   isReady() {
     return this.isAvailable;
   }
@@ -127,6 +131,7 @@ export default class PlantnetBTP {
 
   process(config) {
     const plugin = this;
+    const common = plugin.common;
     var { pluginName, pluginTags, pluginMoreTags, doSimulate, tweet } = config;
     if (config.pluginName === undefined) {
       pluginName = plugin.getName();

@@ -1,0 +1,17 @@
+  <div class="panel panel-info" id="logs">
+    <div class="panel-heading">Les logs du robot</div>
+    <div class="panel-body">
+        <p>
+            Bienvenue sur la page du <a href="https://twitter.com/botEnTrain1" class="umami--click--profile-button">@botEnTrain1</a>
+              - un robot Twitter <a href="https://nodejs.org/" class="umami--click--nodejs-button">NodeJS</a>.<br/>
+            <br/>
+            Voici mes activités récentes:<br/>
+              <ul>
+                <% news.forEach(function(newsEntry){ %>
+                  <li><%- newsEntry  %></li>
+                <% }); %>
+                <li><%- status %></li>
+              </ul>
+        </>
+    </div>
+  </div>

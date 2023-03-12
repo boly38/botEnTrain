@@ -27,6 +27,10 @@ export default class DialogBTP {
     return this.isAvailable;
   }
 
+  getOrders() {
+    return ["reply please", "réponds", "répondez"];
+  }
+
   hasCandidate(tweets, reject) {
     const plugin = this;
     const pluginName = plugin.getName();

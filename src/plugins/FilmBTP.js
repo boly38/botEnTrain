@@ -29,6 +29,13 @@ export default class FilmBTP {
     return ["#BetFilm","#RepliquesDeFilms"].join(' ');
   }
 
+  getSearch() {
+    if (!this.behaviors) {
+      return [];
+    }
+    return this.common.clone(this.behaviors).map(b => b.search);
+  }
+
   isReady() {
     return this.isAvailable;
   }

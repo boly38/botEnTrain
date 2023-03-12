@@ -240,8 +240,6 @@ if (lastTweet) {
 // writeTweet need ApiKey with READ+WRITE SCOPE
 if (testPlan.writeTweet) { // created tweets will be deleted by after() !
 
-  // no automated test for "replyTo"
-
   it("tweet", async () => {
     const message = "this is for #testPurpose";
     logger.debug("create tweet message:", message);
@@ -286,10 +284,7 @@ if (testPlan.writeTweet) { // created tweets will be deleted by after() !
 
   }
 
-
-
 }
-
 
 });
 

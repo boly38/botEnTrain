@@ -19,6 +19,24 @@ export default class BotService {
     engine.logger.info(`started - minInterval:${this.intervalMs} - ${this.getPluginsDetails()}`);
   }
 
+  getPNQuestions() {
+    const engine = this;
+    const pnPlugin = engine.getPluginByName("PlantnetBTP");
+    return pnPlugin?.getQuestions();
+  }
+
+  getFilmSearch() {
+    const engine = this;
+    const filmPlugin = engine.getPluginByName("FilmBTP");
+    return filmPlugin?.getSearch();
+  }
+
+  getOrders() {
+    const engine = this;
+    const ymPlugin = engine.getPluginByName("YesMasterBTP");
+    return ymPlugin?.getOrders();
+  }
+
   getPluginsDetails() {
     if (!Array.isArray(this.plugins) || this.plugins.length < 1) {
       return "(none)";

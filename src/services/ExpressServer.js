@@ -29,6 +29,9 @@ class ExpressServer {
     init() {
         const expressServer = this;
         expressServer.logger.debug("init()");
+        const pnQuestions = expressServer.botService.getPNQuestions();
+        const filmSearch = expressServer.botService.getFilmSearch();
+        const orders = expressServer.botService.getOrders();
         return new Promise(async function (resolve, reject) {
           try {
             expressServer.newsService.add("Réveil du robot en version " + expressServer.version);
@@ -39,12 +42,14 @@ class ExpressServer {
             expressServer.app.use(express.static(path.join(wwwPath, './public')));;
             expressServer.app.set('views', path.join(wwwPath, './views'));
             expressServer.app.set('view engine', 'ejs');
-            expressServer.app.get('/aide', (req, res) => res.render('pages/aide'));
             expressServer.app.get('/hook', (req, res) => expressServer.hookResponse(req, res));
 
             expressServer.app.get('/*',    (req, res) => res.render('pages/index', {
                     "news": expressServer.newsService.getNews(),
                     "status": expressServer.getState(),
+                    pnQuestions,
+                    filmSearch,
+                    orders
                 }))
             expressServer.listeningServer = expressServer.app.listen(expressServer.port,
                 () => expressServer.logger.info(`Listening on ${ expressServer.port }`)

@@ -1,0 +1,15 @@
+  <div class="panel panel-info" id="dialog">
+    <div class="panel-heading">DialogBTP</div>
+    <div class="panel-body">
+              <p>Ce plugin permet à quelqu'un qui souhaite une identification de plante de demander explicitement au robot.</p>
+              <p>Créer un tweet avec dans le texte la mention <code>@botEnTrain1</code> ainsi que l'une des phrases suivante :
+                  <ul>
+                      <% pnQuestions.forEach(function(question) { %>
+                        <li class="ui segment"><strong><%= question %></strong></li>
+                      <% }); %>
+                    </ul>
+              </p>
+              <p>Ajouter au tweet une image de plante ou de fleur à identifier.</p>
+              <p>Le robot va détecter votre tweet et y répondre : utiliser votre image pour identifier via le service Pl@ntNet la plante ou fleur.</p>
+    </div>
+  </div>
