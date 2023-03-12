@@ -4,10 +4,26 @@
   margin-left: 30px;
 }
 
+.panel-heading {
+  padding-left: 10px !important;
+  padding-bottom: 0px !important;
+  padding-top: 10px !important;
+}
+
+.panel-info {
+  margin-top: 4px !important;
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+
 #sendResult {
   margin-left: 30px;
 }
 
 #sendTweet {
   cursor: pointer;
+}
+
+.illustrateTxt {
+  float: right;
 }

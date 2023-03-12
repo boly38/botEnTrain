@@ -1,0 +1,17 @@
+  <div class="panel panel-info" id="film">
+    <div class="panel-heading">FilmBTP</div>
+    <div class="panel-body">
+              <div class="illustrateTxt"><img src="/filmExample.jpg" alt="FilmBTP example"/></div>
+              <p>Je recherche (dans les 7 jours) l'une des citations ci-dessous.</p>
+              <p>Je filtre dans les résultats pour enlever les tweets auxquels j'ai déjà apporté une réponse.</p>
+              <p>Je choisi au hasard un tweet parmi les résultats restants.</p>
+              <p>J'utilise ma connaissance technique pour répondre avec la citation.</p>
+              <p><b>Citations</b>
+                  <ul>
+                      <% filmSearch.forEach(function(quote) { %>
+                        <li class="ui segment"><strong><%= quote %></strong></li>
+                      <% }); %>
+                    </ul>
+              </p>
+    </div>
+  </div>

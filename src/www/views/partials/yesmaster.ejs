@@ -1,0 +1,18 @@
+  <div class="panel panel-info" id="yes">
+    <div class="panel-heading">YesMasterBTP</div>
+    <div class="panel-body">
+              <p>Ce plugin est un peu particulier. Il permet à quelqu'un de pointer un tweet particulier au robot.</p>
+              <p>Le robot va analyser ce tweet et tenter de répondre soit avec les critères de
+                 <a href="#" onClick="toggleContent('plantnet')" class="umami--click--yesplantnet-button">PlantNetBTP</a>,
+                 soit avec les critères de
+                 <a href="#" onClick="toggleContent('film')" class="umami--click--yesfilm-button">FilmBTP</a>.</p>
+              <p>Pour pointer un tweet, créer une réponse au tweet avec dans le texte la mention <code>@botEnTrain1</code> ainsi que l'une des phrases suivante :
+                  <ul>
+                      <% orders.forEach(function(order) { %>
+                        <li class="ui segment"><strong><%= order %></strong></li>
+                      <% }); %>
+                    </ul>
+              </p>
+              <p>Le robot va détecter votre tweet et vous répondre en citant le tweet pointé.</p>
+    </div>
+  </div>

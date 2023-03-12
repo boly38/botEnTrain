@@ -1,0 +1,18 @@
+  <div class="panel panel-info" id="plantnet">
+    <div class="panel-heading">PlantnetBTP</div>
+    <div class="panel-body">
+              <div class="illustrateTxt"><img src="/pnExample.jpg" alt="PlantnetBTP example"/></div>
+              <p>Je recherche (dans les 7 jours) les phrases suivantes:<br/><br/>
+                  <ul>
+                      <% pnQuestions.forEach(function(question) { %>
+                        <li class="ui segment"><strong><%= question %></strong></li>
+                      <% }); %>
+                    </ul>
+              </p>
+              <p>Je filtre dans les résultats pour enlever les tweets auxquels j'ai déjà apporté une réponse.</p>
+              <p>Je choisi au hasard un tweet parmi les résultats restants.</p>
+              <p>Le tweet candidat doit forcément posséder <b>une image</b>.</p>
+              <p>J'utilise le service <a href="https://my.plantnet.org/" target="_new" class="umami--click--myplantnet-button">My Pl@ntNet</a> pour identifier la plante ou fleur.</p>
+              <p>Je produis une réponse au tweet avec le résultat de l'identification.</p>
+    </div>
+  </div>
