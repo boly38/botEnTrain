@@ -1,4 +1,12 @@
 # botEnTrain1
+
+## State
+
+Since June 13, Twitter Lookup API is no more free, so botentrain twitter bot & project are stopped until new order.
+Cf. #99 ticket.
+
+
+## Introduction
 Written in JavaScript for node.js this project is a Twitter bot.
 
 - Twitter account : [@botentrain1](https://twitter.com/botEnTrain1)
@@ -21,27 +29,34 @@ $ git clone https://github.com/boly38/botEnTrain.git
 
 1. Install NodeJs (https://nodejs.org/en/download/)
 2. Install dependencies
-```bash
+
+
+````bash
 npm install
-```
+````
 
 ### Set your own private environment
 
 - study each required environment variable in the [template](./env/.env.template)
 - copy the template in a private file
-```bash 
+
+````bash 
 cp ./env/.env.template ./env/.env.development
+````
 
 ### Start the bot
 
 Execute the application
-```bash
+
+````bash
 npm startDev
-```
+````
+
 or (production mode)
-```bash
+
+````bash
 npm run start
-```
+````
 
 ### Contribution
 Please submit a [pull request](https://github.com/boly38/botEnTrain/pulls)
