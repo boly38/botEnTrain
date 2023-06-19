@@ -27,3 +27,11 @@
 .illustrateTxt {
   float: right;
 }
+
+.msgContainer {
+  border: 2px solid yellow;
+  padding: 20px;
+}
+.msgTitle {
+  font-size: 20px;
+}
