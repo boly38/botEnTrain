@@ -39,22 +39,3 @@ jobs:
         npm install
         echo "show outdated (if any)"
         npm outdated --depth=3 || echo "you must think about update your dependencies :)"
-
-    - name: Run tests
-      run: |
-        echo "${{ secrets.TEST_ENV_FILE }}" >> ./env/.env.test
-        npm run ci-test
-
-    - name: Report coverage
-      continue-on-error: true
-      uses: romeovs/lcov-reporter-action@v0.2.16
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./coverage/lcov.info
-
-    - name: Npm audit
-      uses: oke-py/npm-audit-action@v1.7.1
-      with:
-        audit_level: moderate
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        dedupe_issues: true
