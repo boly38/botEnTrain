@@ -2,9 +2,11 @@
 
 ## State
 
-Since June 13, Twitter Lookup API is no more free, so botentrain twitter bot & project are stopped until new order.
+- Since June 13, Twitter Lookup API is no more free, so botentrain twitter bot & project are stopped until new order.
 Cf. #99 ticket.
 
+- Since May 26, a new [BlueSky social app](https://bsky.app/) bot is born : [botEnSky](https://github.com/boly38/botEnSky).
+- Since May 31, this repository is archived.
 
 ## Introduction
 Written in JavaScript for node.js this project is a Twitter bot.
